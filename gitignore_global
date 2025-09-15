@@ -1,0 +1,120 @@
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon?
+._*
+
+# --- VSCode / JetBrains IDEs ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Node / Vite / React / Express / Expo ---
+node_modules/
+dist/
+build/
+.env
+.env.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.cache/
+.expo/
+.expo-shared/
+web-build/
+*.log
+
+# --- React Native / Expo ---
+android/
+ios/
+*.keystore
+*.jks
+*.p8
+*.p12
+*.key
+
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pkl
+*.db
+db.sqlite3
+media/
+*.sqlite3
+*.log
+.env
+.env.*
+*.pot
+*.pydevproject
+.mypy_cache/
+.pytest_cache/
+coverage/
+htmlcov/
+celerybeat-schedule
+*.mo
+*.log
+instance/
+*.egg-info/
+.eggs/
+*.bak
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django static and media files
+staticfiles/
+static/
+media/
+
+# --- DotNet / C# ---
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.swp
+*.dbmdl
+*.pdb
+*.cache
+*.log
+*.vs/
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+*.ide
+
+# ASP.NET
+wwwroot/
+
+# --- Test / Coverage Tools ---
+coverage/
+.nyc_output/
+__snapshots__/
+jest-html-reporters-*
+*.lcov
+
+# --- Misc ---
+*.tgz
+*.zip
+*.gz
+*.bak
+*.tmp
+*.swp
+*.swo
+*.orig
+*.rej
+
+# --- OS / Editor Swap Files ---
+*~
+*.swp
+*.swo
+*.tmp
+
