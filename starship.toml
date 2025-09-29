@@ -1,0 +1,45 @@
+add_newline = false
+
+[character]
+success_symbol = "➜ "
+error_symbol = "✗ "
+# keep it neutral so the folder/git colors stand out
+
+[directory]
+truncation_length = 1
+truncate_to_repo = false
+style = "bold #C9A0DC"  # Wisteria color for folder
+
+[git_branch]
+symbol = ""
+style = "bold #A084C9"  # Slightly darker shade of wisteria
+
+[git_state]
+style = "bold #A084C9"
+
+[git_status]
+conflicted = "!"
+ahead = "⇡"
+behind = "⇣"
+diverged = "⇕"
+staged = "+"
+modified = "~"
+untracked = "?"
+renamed = "»"
+deleted = "✖"
+style = "#A084C9"
+
+[nodejs]
+disabled = true
+
+[bun]
+disabled = true
+
+[time]
+disabled = true
+
+[battery]
+disabled = true
+
+[jobs]
+disabled = true

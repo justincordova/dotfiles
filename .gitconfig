@@ -1,0 +1,44 @@
+[user]
+	name = Justin Cordova
+	email = justinavodroc@gmail.com
+
+# Use your preferred text editor for commit messages (e.g., nano, vim, code)
+[core]
+	editor = code --wait
+
+# Set line ending handling (important on Windows)
+# For macOS/Linux, usually:
+	autocrlf = input
+
+# Enable colored output for Git commands
+[color]
+	ui = auto
+
+# Show better diffs for certain file types
+[diff "python"]
+	xfuncname = "^[[:space:]]*def "
+
+# Configure push behavior
+[push]
+	default = simple
+
+# Alias common commands to save typing
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	cm = commit
+	df = diff
+	lg = log --oneline --graph --decorate --all
+
+# Credential helper to cache or store passwords securely
+[credential]
+	helper = osxkeychain   # macOS
+	# For Linux, you might use: helper = cache --timeout=3600
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[cola]
+	startupmode = folder
