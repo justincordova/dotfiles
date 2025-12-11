@@ -120,3 +120,8 @@ cot() {
   fi
 }
 alias icloud='cd ~/Library/Mobile\ Documents/com~apple~CloudDocs'
+
+# Added by Antigravity
+export PATH="/Users/justincordova/.antigravity/antigravity/bin:$PATH"
+
+alias claude="/Users/justincordova/.claude/local/claude"
