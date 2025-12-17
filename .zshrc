@@ -150,7 +150,7 @@ function idlem() {
     1) asciiquarium ;;
     2) pipes.sh ;;
     3) cbonsai ;;
-    4) tty-clock -s -c -C 5 ;;
+    4) tty-clock -s -c -C 5 -t ;;
     *) echo "Invalid option." ;;
   esac
 }
