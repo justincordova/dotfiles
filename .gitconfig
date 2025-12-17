@@ -42,3 +42,5 @@
 	required = true
 [cola]
 	startupmode = folder
+[coderabbit]
+	machineId = cli/d8ee683134814c33b20af5bcb9ad932d

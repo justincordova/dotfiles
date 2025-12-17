@@ -1,3 +1,12 @@
+# Ghostty Auto-Launch Hook
+# Check immediately if we need to run a pending command
+if [[ -f "$HOME/.ghostty_launch_pending" ]]; then
+    # Source the pending command
+    . "$HOME/.ghostty_launch_pending"
+    # Cleanup
+    rm "$HOME/.ghostty_launch_pending"
+fi
+
 ##### Environment Setup
 
 # Oh My Zsh directory
@@ -125,3 +134,23 @@ alias icloud='cd ~/Library/Mobile\ Documents/com~apple~CloudDocs'
 export PATH="/Users/justincordova/.antigravity/antigravity/bin:$PATH"
 
 alias claude="/Users/justincordova/.claude/local/claude"
+alias fishy="asciiquarium"
+
+function idlem() {
+  echo "Choose a terminal idle program:"
+  echo "1) Asciiquarium"
+  echo "2) Pipes"
+  echo "3) Cbonsai"
+  echo "4) TTY Clock"
+  echo -n "> "
+  read -k 1 opt
+  echo "" # New line after input
+
+  case $opt in
+    1) asciiquarium ;;
+    2) pipes.sh ;;
+    3) cbonsai ;;
+    4) tty-clock -s -c -C 5 ;;
+    *) echo "Invalid option." ;;
+  esac
+}
