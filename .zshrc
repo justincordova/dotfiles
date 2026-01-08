@@ -78,6 +78,7 @@ alias lg="lazygit"
 # General
 alias c='clear'
 alias reload='source ~/.zshrc'
+alias oc='opencode'
 
 # Python
 alias py3='python3'

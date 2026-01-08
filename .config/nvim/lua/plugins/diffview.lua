@@ -1,4 +1,6 @@
 return {
   "sindrets/diffview.nvim",
-  opts = {},
+  opts = {
+    hg_cmd = "git",
+  },
 }
