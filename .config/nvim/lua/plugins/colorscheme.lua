@@ -9,6 +9,9 @@ return {
       require("github-theme").setup({
         -- options
       })
+      vim.cmd.colorscheme("github_dark_default")
+      -- Set dashboard header to red from GitHub Dark Default
+      vim.api.nvim_set_hl(0, "SnacksDashboardHeader", { fg = "#ff7b72", bold = true })
     end,
   },
 
@@ -57,14 +60,6 @@ return {
     opts = {
       transparent_background = true,
       variant = "medium",
-    },
-  },
-
-  -- Configure LazyVim to load github_dark_default by default
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "github_dark_default",
     },
   },
 }
