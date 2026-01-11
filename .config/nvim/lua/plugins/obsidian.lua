@@ -5,6 +5,7 @@ return {
   ft = "markdown",
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope.nvim",
   },
   keys = {
     { "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Obsidian Note" },
@@ -13,10 +14,23 @@ return {
     { "<leader>od", "<cmd>ObsidianToday<cr>", desc = "Obsidian Today" },
   },
   opts = {
+    picker = {
+      name = "telescope.nvim",
+    },
+    mappings = {
+      -- Overrides the 'gf' mapping to work on markdown/wiki links within your vault.
+      ["gf"] = {
+        action = function()
+          return require("obsidian").util.gf_passthrough()
+        end,
+        opts = { noremap = false, expr = true, buffer = true },
+      },
+    },
+    ui = { enable = false },
     workspaces = {
       {
         name = "personal",
-        path = "~/obsidian", -- Default path, adjust as needed
+        path = "/Users/justincordova/Library/Mobile Documents/iCloud~md~obsidian/Documents",
       },
     },
   },

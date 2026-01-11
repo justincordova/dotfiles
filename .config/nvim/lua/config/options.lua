@@ -8,3 +8,6 @@ vim.g.loaded_ruby_provider = 0
 -- Set python3 host to avoid pyenv warning and ensure correct python is used
 vim.g.python3_host_prog = "/opt/homebrew/bin/python3"
 
+-- Ensure conceallevel is set for plugins that hide markup
+vim.opt.conceallevel = 2
+

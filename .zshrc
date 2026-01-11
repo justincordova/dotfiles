@@ -1,69 +1,43 @@
-# Ghostty Auto-Launch Hook
-# Check immediately if we need to run a pending command
-if [[ -f "$HOME/.ghostty_launch_pending" ]]; then
-    # Source the pending command
-    . "$HOME/.ghostty_launch_pending"
-    # Cleanup
-    rm "$HOME/.ghostty_launch_pending"
-fi
-
-##### Environment Setup
-
-# Oh My Zsh directory
+# --- Environment & Path ---
 export ZSH="$HOME/.oh-my-zsh"
-
-# Disable Oh My Zsh themes (Starship handles prompt)
-ZSH_THEME=""
-#ht
-
-# BAT theme for pretty output
 export BAT_THEME="Twork"
-
-# Path additions
-export PATH="/opt/homebrew/bin:$PATH"
-
-# Bun setup
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+export NVM_DIR="$HOME/.nvm"
+export PATH="/Users/justincordova/.antigravity/antigravity/bin:$BUN_INSTALL/bin:/opt/homebrew/bin:$PATH"
 
-##### Plugins & Oh My Zsh Init
-
-plugins=(
-  git
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  web-search
-  z
-)
-
+# --- Zsh Config ---
+ZSH_THEME=""
+ENABLE_CORRECTION="true"
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search z)
 source $ZSH/oh-my-zsh.sh
 
-##### Conda Initialization
-
-__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-elif [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
-    . "/opt/anaconda3/etc/profile.d/conda.sh"
-fi
-unset __conda_setup
-
-##### Completions & Init
-
+# --- History & Completion ---
+HISTSIZE=10000; SAVEHIST=10000; HISTFILE=~/.zsh_history
+setopt inc_append_history share_history hist_ignore_dups hist_ignore_space hist_verify
 autoload -U compinit; compinit
-
-# Bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# Faster completions cache
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
 
-##### Aliases
+# --- Tools Initialization ---
+eval "$(starship init zsh)"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# Conda
+__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then eval "$__conda_setup"; elif [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then . "/opt/anaconda3/etc/profile.d/conda.sh"; fi; unset __conda_setup
+
+# --- Aliases ---
+alias c='clear'
+alias reload='source ~/.zshrc'
+alias ls='ls -G'
 
 # Navigation
 alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/"
+alias obi="cd /Users/justincordova/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/obi"
 alias codep='code .. --reuse-window'
+alias oc='opencode'
 
 # Git
 alias gs='git status'
@@ -75,83 +49,25 @@ alias gco='git checkout'
 alias gl='git log --oneline --graph --decorate'
 alias lg="lazygit"
 
-# General
-alias c='clear'
-alias reload='source ~/.zshrc'
-alias oc='opencode'
-
-# Python
+# Dev / Misc
 alias py3='python3'
 alias py='python'
-
-# macOS colored ls
-alias ls='ls -G'
-
-# Make + cd
-mkcd() {
-  mkdir -p "$1" && cd "$1"
-}
-
-##### History Config
-
-HISTSIZE=10000
-SAVEHIST=10000
-HISTFILE=~/.zsh_history
-
-setopt inc_append_history
-setopt share_history
-setopt hist_ignore_dups
-setopt hist_ignore_space
-setopt hist_verify
-
-##### Config Flags
-
-ENABLE_CORRECTION="true"
-
-##### Starship Prompt
-
-eval "$(starship init zsh)"
-
-##### NVM Setup
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-##### CotEditor Function
-
-cot() {
-  if [ $# -eq 0 ]; then
-    # no args -> just open CotEditor
-    open -a CotEditor
-  else
-    # pass args -> open files with CotEditor
-    open -a CotEditor "$@"
-  fi
-}
-alias icloud='cd ~/Library/Mobile\ Documents/com~apple~CloudDocs'
-
-# Added by Antigravity
-export PATH="/Users/justincordova/.antigravity/antigravity/bin:$PATH"
-
 alias claude="/Users/justincordova/.claude/local/claude"
 alias fishy="asciiquarium"
 
-function idlem() {
-  echo "Choose a terminal idle program:"
-  echo "1) Asciiquarium"
-  echo "2) Pipes"
-  echo "3) Cbonsai"
-  echo "4) TTY Clock"
-  echo -n "> "
-  read -k 1 opt
-  echo "" # New line after input
+# --- Functions ---
+mkcd() { mkdir -p "$1" && cd "$1"; }
+cot() { if [ $# -eq 0 ]; then open -a CotEditor; else open -a CotEditor "$@"; fi }
 
+idlem() {
+  echo "1) Asciiquarium\n2) Pipes\n3) Cbonsai\n4) TTY Clock\n> "
+  read -k 1 opt; echo ""
   case $opt in
-    1) asciiquarium ;;
-    2) pipes.sh ;;
-    3) cbonsai ;;
-    4) tty-clock -s -c -C 5 -t ;;
-    *) echo "Invalid option." ;;
+    1) asciiquarium ;; 2) pipes.sh ;; 3) cbonsai ;; 4) tty-clock -s -c -C 5 -t ;; *) echo "Invalid option." ;; 
   esac
 }
+
+# --- Auto-start ---
+if command -v tmux &>/dev/null && [ -z "$TMUX" ]; then
+  tmux attach -t main || tmux new -s main
+fi
