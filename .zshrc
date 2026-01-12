@@ -29,6 +29,7 @@ __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then eval "$__conda_setup"; elif [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then . "/opt/anaconda3/etc/profile.d/conda.sh"; fi; unset __conda_setup
 
 # --- Aliases ---
+alias vi='nvim'
 alias c='clear'
 alias reload='source ~/.zshrc'
 alias ls='ls -G'

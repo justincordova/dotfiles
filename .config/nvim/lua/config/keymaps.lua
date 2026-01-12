@@ -7,20 +7,23 @@ vim.keymap.set("n", "<leader>cs", function()
 end, { desc = "Colorscheme Switcher" })
 
 -- Disable terminal keymaps to favor tmux
-vim.keymap.del("n", "<leader>ft")
-vim.keymap.del("n", "<leader>fT")
-vim.keymap.del("n", "<c-/>")
-vim.keymap.del("n", "<c-_>")
+pcall(vim.keymap.del, "n", "<leader>ft")
+pcall(vim.keymap.del, "n", "<leader>fT")
+pcall(vim.keymap.del, "n", "<c-/>")
+pcall(vim.keymap.del, "n", "<c-_>")
+pcall(vim.keymap.del, "n", "<leader>K")
 
--- Edit pinned directories
-vim.keymap.set("n", "<leader>ep", function()
-  vim.cmd("edit " .. vim.fn.stdpath("config") .. "/lua/config/pins.lua")
-end, { desc = "Edit pinned directories" })
+-- Buffer Management
+vim.keymap.set("n", "<leader>bd", "<cmd>bd<cr>", { desc = "Delete Buffer" })
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 
--- Reload pins + redraw dashboard
-vim.keymap.set("n", "<leader>rp", function()
-  package.loaded["config.pins"] = nil
-  -- Reopen dashboard with Snacks
-  vim.cmd("enew")
-  Snacks.dashboard.open()
-end, { desc = "Reload pinned directories" })
+-- Tab Management
+vim.keymap.set("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab" })
+vim.keymap.set("n", "<leader><tab>f", "<cmd>tabfirst<cr>", { desc = "First Tab" })
+vim.keymap.set("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
+vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
+vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
+vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })

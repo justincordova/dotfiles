@@ -4,8 +4,8 @@ return {
   version = false, -- telescope did not have a release in a long time
   dependencies = { "nvim-lua/plenary.nvim" },
   keys = {
-    { "<leader>,", "<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>", desc = "Switch Buffer" },
-    { "<leader>/", "<cmd>Telescope live_grep<cr>", desc = "Grep (Root Dir)" },
+    { "<leader>,", function() Snacks.picker.buffers() end, desc = "Switch Buffer" },
+    { "<leader><space>", function() Snacks.picker.files() end, desc = "Find Files (Root Dir)" },
     { "<leader>:", "<cmd>Telescope command_history<cr>", desc = "Command History" },
     { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files (Root Dir)" },
     -- find
