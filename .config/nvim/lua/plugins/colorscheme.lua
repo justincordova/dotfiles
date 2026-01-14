@@ -10,6 +10,7 @@ return {
       transparent_background = false,
       integrations = {
         cmp = true,
+        bufferline = true,
         gitsigns = true,
         nvimtree = false,
         neotree = true,

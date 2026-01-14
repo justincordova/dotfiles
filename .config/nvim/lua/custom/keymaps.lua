@@ -27,8 +27,7 @@ vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move line up' })
 -- Buffer navigation
 vim.keymap.set('n', '<S-h>', '<cmd>bprevious<cr>', { desc = 'Prev buffer' })
 vim.keymap.set('n', '<S-l>', '<cmd>bnext<cr>', { desc = 'Next buffer' })
-vim.keymap.set('n', '[b', '<cmd>bprevious<cr>', { desc = 'Prev buffer' })
-vim.keymap.set('n', ']b', '<cmd>bnext<cr>', { desc = 'Next buffer' })
+-- Note: [b and ]b are defined in bufferline.lua
 
 -- Window navigation (will be enhanced by tmux-navigator)
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })

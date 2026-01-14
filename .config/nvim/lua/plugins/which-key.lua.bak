@@ -29,8 +29,6 @@ return {
         { pattern = "Split", icon = " ", color = "purple" },
         { pattern = "Command History", icon = " ", color = "yellow" },
         { pattern = "Rename", icon = "󰑕 ", color = "cyan" },
-        { pattern = "fold", icon = " ", color = "purple" },
-        { pattern = "Fold", icon = " ", color = "purple" },
       },
       keys = vim.g.have_nerd_font and {} or {
         Up = '<Up> ',
@@ -74,7 +72,7 @@ return {
       { '<leader>u', group = ' UI Toggles' },
       { '<leader>w', group = ' Windows' },
       { '<leader>x', group = ' Diagnostics' },
-      { '<leader>z', group = 'Folding', icon = '󰘖 ' },
+      { '<leader>z', group = ' Folding & Zen', icon = ' ' },
       { '<leader><tab>', group = ' Tabs' },
       -- Explicit icons for specific mappings
       { '<leader>e', icon = ' ' }, -- Explorer
@@ -84,18 +82,6 @@ return {
       { '<leader>\\', icon = ' ' }, -- Split Right
       { '<leader>:', icon = ' ' }, -- Command History
       { '<leader>h', icon = ' ' }, -- Check Health
-      -- Folding keybindings (basic vim + nvim-ufo enhanced)
-      { 'z', group = 'Fold' },
-      { 'za', desc = 'Toggle fold' },
-      { 'zo', desc = 'Open fold' },
-      { 'zc', desc = 'Close fold' },
-      { 'zO', desc = 'Open fold recursively' },
-      { 'zC', desc = 'Close fold recursively' },
-      { 'zR', desc = 'Open all folds' },
-      { 'zM', desc = 'Close all folds' },
-      { 'zr', desc = 'Fold less' },
-      { 'zm', desc = 'Fold more' },
-      { 'zp', desc = 'Peek fold' },
     },
   },
 }

@@ -50,7 +50,7 @@ return {
   },
   keys = {
     {
-      '<leader>z',
+      '<leader>uz',
       '<cmd>ZenMode<cr>',
       desc = 'Zen Mode',
     },
