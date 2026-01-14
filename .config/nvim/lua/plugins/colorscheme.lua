@@ -1,65 +1,66 @@
+-- [[ Colorschemes ]]
 return {
-  -- GitHub Theme
+  -- Catppuccin (default theme)
   {
-    "projekt0n/github-nvim-theme",
-    name = "github-theme",
-    lazy = false,
+    'catppuccin/nvim',
+    name = 'catppuccin',
     priority = 1000,
-    config = function()
-      require("github-theme").setup({
-        -- options
-      })
-      vim.cmd.colorscheme("github_dark_default")
-      -- Set dashboard header to red from GitHub Dark Default
-      vim.api.nvim_set_hl(0, "SnacksDashboardHeader", { fg = "#ff7b72", bold = true })
-    end,
-  },
-
-  -- Catppuccin
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
     opts = {
-      flavour = "mocha",
-      transparent_background = true,
+      flavour = 'mocha', -- latte, frappe, macchiato, mocha
+      transparent_background = false,
       integrations = {
         cmp = true,
         gitsigns = true,
-        nvimtree = true,
+        nvimtree = false,
+        neotree = true,
         treesitter = true,
         notify = true,
-        dashboard = true,
-        mini = { enabled = true },
+        mini = {
+          enabled = true,
+        },
+        telescope = {
+          enabled = true,
+        },
+        which_key = true,
+        indent_blankline = {
+          enabled = true,
+          colored_indent_levels = false,
+        },
       },
     },
+    config = function(_, opts)
+      require('catppuccin').setup(opts)
+
+      -- Load saved colorscheme or default to catppuccin-mocha
+      local utils = require('custom.utils')
+      local saved_colorscheme = utils.load_saved_colorscheme()
+
+      if saved_colorscheme and saved_colorscheme ~= '' then
+        pcall(vim.cmd.colorscheme, saved_colorscheme)
+      else
+        vim.cmd.colorscheme 'catppuccin-mocha'
+      end
+    end,
   },
 
-  -- Tokyonight
+  -- GitHub Themes
   {
-    "folke/tokyonight.nvim",
-    lazy = true,
-    opts = { style = "moon" },
-  },
-
-  -- Kanagawa
-  {
-    "rebelot/kanagawa.nvim",
-    lazy = true,
-  },
-
-  -- Gruvbox
-  {
-    "ellisonleao/gruvbox.nvim",
-    lazy = true,
-  },
-
-  -- Evergarden
-  {
-    "comfysage/evergarden",
-    priority = 1000,
-    opts = {
-      transparent_background = true,
-      variant = "medium",
-    },
+    'projekt0n/github-nvim-theme',
+    lazy = false,
+    priority = 999,
+    config = function()
+      require('github-theme').setup {
+        options = {
+          transparent = false,
+          terminal_colors = true,
+          dim_inactive = false,
+          styles = {
+            comments = 'italic',
+            keywords = 'bold',
+            types = 'italic,bold',
+          },
+        },
+      }
+    end,
   },
 }

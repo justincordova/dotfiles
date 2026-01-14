@@ -1,4 +1,3 @@
-# --- Environment & Path ---
 export ZSH="$HOME/.oh-my-zsh"
 export BAT_THEME="Twork"
 export BUN_INSTALL="$HOME/.bun"
@@ -29,7 +28,6 @@ __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then eval "$__conda_setup"; elif [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then . "/opt/anaconda3/etc/profile.d/conda.sh"; fi; unset __conda_setup
 
 # --- Aliases ---
-alias vi='nvim'
 alias c='clear'
 alias reload='source ~/.zshrc'
 alias ls='ls -G'
@@ -41,13 +39,6 @@ alias codep='code .. --reuse-window'
 alias oc='opencode'
 
 # Git
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
-alias gpl='git pull --rebase'
-alias gco='git checkout'
-alias gl='git log --oneline --graph --decorate'
 alias lg="lazygit"
 
 # Dev / Misc
@@ -64,7 +55,7 @@ idlem() {
   echo "1) Asciiquarium\n2) Pipes\n3) Cbonsai\n4) TTY Clock\n> "
   read -k 1 opt; echo ""
   case $opt in
-    1) asciiquarium ;; 2) pipes.sh ;; 3) cbonsai ;; 4) tty-clock -s -c -C 5 -t ;; *) echo "Invalid option." ;; 
+    1) asciiquarium ;; 2) pipe.sh ;; 3) cbonsai ;; 4) tty-clock -s -c -C 5 -t ;; *) echo "Invalid option." ;; 
   esac
 }
 
