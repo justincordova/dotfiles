@@ -61,6 +61,6 @@ idlem() {
 }
 
 # --- Auto-start ---
-if command -v tmux &>/dev/null && [ -z "$TMUX" ]; then
+if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
   tmux attach -t main || tmux new -s main
 fi
