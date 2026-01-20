@@ -34,6 +34,7 @@ alias ls='ls -G'
 
 # Navigation
 alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/"
+alias v="nvim"
 alias obi="cd /Users/justincordova/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/obi"
 alias codep='code .. --reuse-window'
 alias oc='opencode'
