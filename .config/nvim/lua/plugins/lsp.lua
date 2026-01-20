@@ -6,7 +6,7 @@ return {
     event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
       -- Mason for managing LSP servers
-      { 'williamboman/mason.nvim', config = true },
+      { 'williamboman/mason.nvim', cmd = 'Mason', build = ':MasonUpdate', config = true },
       { 'williamboman/mason-lspconfig.nvim' },
 
       -- Useful status updates for LSP
