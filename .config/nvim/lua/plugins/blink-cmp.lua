@@ -28,6 +28,26 @@ return {
       default = { 'lsp', 'path', 'snippets', 'buffer' },
     },
 
+    cmdline = {
+      completion = {
+        menu = {
+          auto_show = true,
+        },
+      },
+      sources = function()
+        local type = vim.fn.getcmdtype()
+        -- Search
+        if type == '/' or type == '?' then
+          return { 'buffer' }
+        end
+        -- Commands
+        if type == ':' then
+          return { 'cmdline' }
+        end
+        return {}
+      end,
+    },
+
     completion = {
       menu = {
         border = 'rounded',

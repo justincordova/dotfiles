@@ -74,6 +74,10 @@ vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 
+-- Command line completion
+vim.opt.wildmode = 'longest:full,full' -- Command-line completion mode
+vim.opt.wildoptions = 'pum' -- Popup menu for command-line completion
+
 -- Wrap settings
 vim.opt.wrap = false
 
