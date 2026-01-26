@@ -10,7 +10,7 @@ return {
       typescript = { 'eslint' },
       javascriptreact = { 'eslint' },
       typescriptreact = { 'eslint' },
-      python = { 'pylint', 'mypy' },
+      python = { 'ruff', 'mypy' },
       sh = { 'shellcheck' },
       bash = { 'shellcheck' },
       dockerfile = { 'hadolint' },

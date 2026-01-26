@@ -82,7 +82,7 @@ vim.opt.wildoptions = 'pum' -- Popup menu for command-line completion
 vim.opt.wrap = false
 
 -- Auto-save toggle (global state)
-vim.g.auto_save_enabled = true
+vim.g.auto_save_enabled = false
 
 -- Folding (will be enhanced by nvim-ufo)
 vim.opt.foldcolumn = '1'

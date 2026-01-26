@@ -45,7 +45,6 @@ alias lg="lazygit"
 # Dev / Misc
 alias py3='python3'
 alias py='python'
-alias claude="/Users/justincordova/.claude/local/claude"
 alias fishy="asciiquarium"
 
 # --- Functions ---
@@ -64,3 +63,4 @@ idlem() {
 if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
   tmux attach -t main || tmux new -s main
 fi
+export PATH="$HOME/.local/bin:$PATH"

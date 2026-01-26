@@ -120,6 +120,7 @@ return {
         postgres_lsp = {},
         prismals = {},
         pyright = {},
+        ruff = {},
         rust_analyzer = {},
         sqlls = {},
         tailwindcss = {},
