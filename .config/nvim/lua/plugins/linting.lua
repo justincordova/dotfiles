@@ -15,6 +15,7 @@ return {
       bash = { 'shellcheck' },
       dockerfile = { 'hadolint' },
       gitcommit = { 'gitlint' },
+      go = { 'golangcilint' },
       -- markdown = { 'vale' },
     }
 
