@@ -9,6 +9,9 @@ ZSH_THEME=""
 ENABLE_CORRECTION="true"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search z)
 source $ZSH/oh-my-zsh.sh
+unsetopt correct
+unsetopt correctall
+
 
 # --- History & Completion ---
 HISTSIZE=10000; SAVEHIST=10000; HISTFILE=~/.zsh_history
@@ -16,7 +19,6 @@ setopt inc_append_history share_history hist_ignore_dups hist_ignore_space hist_
 autoload -U compinit; compinit
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
-
 # --- Tools Initialization ---
 eval "$(starship init zsh)"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"

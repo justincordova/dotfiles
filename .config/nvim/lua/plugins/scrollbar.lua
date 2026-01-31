@@ -23,7 +23,7 @@ return {
     },
     handlers = {
       cursor = true,
-      diagnostic = true,
+      diagnostic = false, -- Disabled to prevent "Invalid buffer id" errors
       gitsigns = true,
       handle = true,
       search = false, -- Disabled: requires nvim-hlslens plugin
