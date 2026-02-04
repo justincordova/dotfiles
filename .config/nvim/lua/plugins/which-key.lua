@@ -31,6 +31,8 @@ return {
         { pattern = "Rename", icon = "󰑕 ", color = "cyan" },
         { pattern = "fold", icon = " ", color = "purple" },
         { pattern = "Fold", icon = " ", color = "purple" },
+        { pattern = "Claude", icon = "󰚩 ", color = "purple" },
+        { pattern = "OpenCode", icon = "󰚩 ", color = "purple" },
       },
       keys = vim.g.have_nerd_font and {} or {
         Up = '<Up> ',
@@ -64,10 +66,12 @@ return {
       },
     },
     spec = {
+      { '<leader>a', group = ' Claude' },
       { '<leader>b', group = ' Buffers' },
       { '<leader>c', group = ' Code' },
       { '<leader>f', group = ' Find' },
       { '<leader>g', group = ' Git' },
+      { '<leader>o', group = ' OpenCode' },
       { '<leader>q', group = ' Quit/Session' },
       { '<leader>r', group = ' Rename', icon = '󰑕 ' },
       { '<leader>s', group = ' Search' },

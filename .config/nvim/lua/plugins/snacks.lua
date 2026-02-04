@@ -1,19 +1,13 @@
 return {
   "folke/snacks.nvim",
   priority = 1000,
-  keys = {
-    { "<leader>s", false },
-    { "<leader>S", false },
-    { "<leader>/", false },
-  },
   opts = {
     scroll = { enabled = true },
     notifier = { enabled = true },
     quickfile = {},
-    picker = {
-      hidden = true,
-      ignored = true,
-    },
+    picker = { enabled = true },
+    input = { enabled = true },
+    terminal = { enabled = true },
     sources = {
       explorer = {
         hidden = true,
