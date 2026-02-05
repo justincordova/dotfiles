@@ -34,6 +34,9 @@ vim.opt.breakindent = true
 -- Save undo history
 vim.opt.undofile = true
 
+-- Enable autoread
+vim.opt.autoread = true
+
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -47,6 +50,9 @@ vim.opt.updatetime = 250
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
+
+-- Reduce message output (hide swapfile warnings, etc.)
+vim.opt.shortmess:append({ W = true })
 
 -- Configure how new splits should be opened
 vim.opt.splitright = true
@@ -78,8 +84,9 @@ vim.opt.smartindent = true
 vim.opt.wildmode = 'longest:full,full' -- Command-line completion mode
 vim.opt.wildoptions = 'pum' -- Popup menu for command-line completion
 
--- Wrap settings
+-- Wrap settings (wrapping.nvim will toggle this for text files)
 vim.opt.wrap = false
+vim.opt.linebreak = true -- Break at word boundaries, not mid-word
 
 -- Auto-save toggle (global state)
 vim.g.auto_save_enabled = false

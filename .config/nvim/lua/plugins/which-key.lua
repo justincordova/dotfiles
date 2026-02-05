@@ -79,6 +79,7 @@ return {
       { '<leader>w', group = ' Windows' },
       { '<leader>x', group = ' Diagnostics' },
       { '<leader>z', group = 'Folding', icon = '󰘖 ' },
+      { '<leader>W', group = ' Wrapping' },
       { '<leader><tab>', group = ' Tabs' },
       -- Explicit icons for specific mappings
       { '<leader>e', icon = ' ' }, -- Explorer
@@ -100,6 +101,14 @@ return {
       { 'zr', desc = 'Fold less' },
       { 'zm', desc = 'Fold more' },
       { 'zp', desc = 'Peek fold' },
+      -- Wrapping keybindings (from wrapping.nvim plugin)
+      { '[ow', desc = 'Soft wrap mode', icon = '󰗘 ' },
+      { ']ow', desc = 'Hard wrap mode', icon = '󰙘 ' },
+      { 'yow', desc = 'Toggle wrap mode', icon = '󰘚 ' },
+      -- Custom leader keybindings for wrapping
+      { '<leader>Ws', desc = 'Soft wrap mode', icon = '󰗘 ' },
+      { '<leader>Wh', desc = 'Hard wrap mode', icon = '󰙘 ' },
+      { '<leader>Wt', desc = 'Toggle wrap mode', icon = '󰘚 ' },
     },
   },
 }

@@ -92,17 +92,22 @@ return {
 
       -- LSP servers and their configurations
       local servers = {
-        angularls = {},
+        angularls = {
+          root_dir = require('lspconfig.util').root_pattern 'angular.json',
+        },
         bashls = {},
         clangd = {},
         cssls = {},
         dockerls = {},
         emmet_ls = {},
-        eslint = {},
+        eslint = {
+          on_attach = function(client)
+            client.server_capabilities.documentFormattingProvider = false
+          end,
+        },
         gopls = {},
         graphql = {},
         html = {},
-        jdtls = {},
         jsonls = {},
         lua_ls = {
           settings = {
@@ -122,10 +127,8 @@ return {
         pyright = {},
         ruff = {},
         rust_analyzer = {},
-        sqlls = {},
         tailwindcss = {},
         taplo = {},
-        ts_ls = {},
         vtsls = {},
       }
 
