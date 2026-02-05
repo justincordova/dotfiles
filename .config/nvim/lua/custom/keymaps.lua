@@ -119,5 +119,12 @@ vim.keymap.set("n", "<leader>,", "<cmd>Telescope buffers<cr>", { desc = "Switch 
 vim.keymap.set("n", "<leader>-", "<cmd>split<cr>", { desc = "Split Below" })
 vim.keymap.set("n", "<leader>\\", "<cmd>vsplit<cr>", { desc = "Split Right" })
 vim.keymap.set("n", "<leader>:", "<cmd>Telescope command_history<cr>", { desc = "Command History" })
+
+-- Scratch
+local scratch = require "custom.scratch"
+scratch.setup()
+vim.keymap.set("n", "<leader>so", scratch.open, { desc = "Open scratch" })
+vim.keymap.set("n", "<leader>se", scratch.export, { desc = "Export scratch" })
+vim.keymap.set("n", "<leader>ss", scratch.search_fleeting, { desc = "Search fleeting notes" })
 -- Note: Plugin-specific keymaps will be defined in their respective plugin config files
 -- This includes: telescope, neo-tree, lazygit, gitsigns, LSP, trouble, undotree, etc.
