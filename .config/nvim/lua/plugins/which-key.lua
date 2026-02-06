@@ -76,11 +76,11 @@ return {
       { '<leader>r', group = ' Rename', icon = '󰑕 ' },
       { '<leader>s', group = ' Search' },
       { '<leader>u', group = ' UI Toggles' },
-      { '<leader>w', group = ' Windows' },
       { '<leader>x', group = ' Diagnostics' },
       { '<leader>z', group = 'Folding', icon = '󰘖 ' },
+      { '[b', desc = 'Prev buffer' },
+      { ']b', desc = 'Next buffer' },
       { '<leader>W', group = ' Wrapping' },
-      { '<leader><tab>', group = ' Tabs' },
       -- Explicit icons for specific mappings
       { '<leader>e', icon = ' ' }, -- Explorer
       { '<leader>E', icon = ' ' }, -- Explorer

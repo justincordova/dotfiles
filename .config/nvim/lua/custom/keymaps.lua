@@ -52,14 +52,6 @@ vim.keymap.set("n", "<leader>wj", "<C-w>j", { desc = "Go to lower window" })
 vim.keymap.set("n", "<leader>wk", "<C-w>k", { desc = "Go to upper window" })
 vim.keymap.set("n", "<leader>wl", "<C-w>l", { desc = "Go to right window" })
 
--- Tab Management
-vim.keymap.set("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last tab" })
-vim.keymap.set("n", "<leader><tab>f", "<cmd>tabfirst<cr>", { desc = "First tab" })
-vim.keymap.set("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New tab" })
-vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next tab" })
-vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close tab" })
-vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous tab" })
-
 -- UI Toggles (Leader u)
 vim.keymap.set("n", "<leader>un", "<cmd>set number!<cr>", { desc = "Toggle line numbers" })
 vim.keymap.set("n", "<leader>ur", "<cmd>set relativenumber!<cr>", { desc = "Toggle relative numbers" })
@@ -115,6 +107,7 @@ vim.keymap.set("n", "<leader>h", function()
   vim.bo[health_buf].bufhidden = "wipe"
 end, { desc = "Check Health" })
 vim.keymap.set("n", "<leader>cm", "<cmd>Mason<cr>", { desc = "Mason" })
+vim.keymap.set("n", "<leader>gg", ":!tmux new-window -c " .. vim.fn.getcwd() .. " -- lazygit <CR><CR>", { silent = true, desc = "LazyGit" })
 vim.keymap.set("n", "<leader>,", "<cmd>Telescope buffers<cr>", { desc = "Switch Buffer" })
 vim.keymap.set("n", "<leader>-", "<cmd>split<cr>", { desc = "Split Below" })
 vim.keymap.set("n", "<leader>\\", "<cmd>vsplit<cr>", { desc = "Split Right" })
@@ -127,4 +120,4 @@ vim.keymap.set("n", "<leader>so", scratch.open, { desc = "Open scratch" })
 vim.keymap.set("n", "<leader>se", scratch.export, { desc = "Export scratch" })
 vim.keymap.set("n", "<leader>ss", scratch.search_fleeting, { desc = "Search fleeting notes" })
 -- Note: Plugin-specific keymaps will be defined in their respective plugin config files
--- This includes: telescope, neo-tree, lazygit, gitsigns, LSP, trouble, undotree, etc.
+-- This includes: telescope, neo-tree, gitsigns, LSP, trouble, undotree, etc.

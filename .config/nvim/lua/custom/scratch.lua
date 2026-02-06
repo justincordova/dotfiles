@@ -50,7 +50,9 @@ end
 
 function M.open()
   ensure_scratch_file()
-  vim.cmd("edit " .. vim.fn.fnameescape(scratch_path))
+  vim.schedule(function()
+    vim.cmd("edit " .. vim.fn.fnameescape(scratch_path))
+  end)
 end
 
 function M.export()
