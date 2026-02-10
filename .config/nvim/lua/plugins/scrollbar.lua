@@ -23,10 +23,10 @@ return {
     },
     handlers = {
       cursor = true,
-      diagnostic = false, -- Disabled to prevent "Invalid buffer id" errors
-      gitsigns = true,
+      diagnostic = false,
+      gitsigns = false,
       handle = true,
-      search = false, -- Disabled: requires nvim-hlslens plugin
+      search = false,
     },
   },
 }

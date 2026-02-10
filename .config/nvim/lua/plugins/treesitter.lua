@@ -59,6 +59,7 @@ return {
           select = {
             enable = true,
             lookahead = true,
+            disable = { 'markdown' },
             keymaps = {
               ['af'] = '@function.outer',
               ['if'] = '@function.inner',

@@ -3,6 +3,8 @@ export BAT_THEME="Twork"
 export BUN_INSTALL="$HOME/.bun"
 export NVM_DIR="$HOME/.nvm"
 export PATH="/Users/justincordova/.antigravity/antigravity/bin:$BUN_INSTALL/bin:/opt/homebrew/bin:$PATH"
+# Add Go binaries to PATH
+export PATH="$PATH:$(go env GOPATH)/bin"
 
 # --- Zsh Config ---
 ZSH_THEME=""
