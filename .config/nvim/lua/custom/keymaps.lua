@@ -20,6 +20,11 @@ vim.keymap.set("v", "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
 
+-- Clipboard (macOS Cmd keys)
+vim.keymap.set({ "n", "v" }, "<D-v>", '"+p', { desc = "Paste from clipboard" })
+vim.keymap.set({ "i", "c" }, "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })
+vim.keymap.set("v", "<D-c>", '"+y', { desc = "Copy to clipboard" })
+
 -- Move lines
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move line down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move line up" })
