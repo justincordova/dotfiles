@@ -78,6 +78,7 @@ return {
       { '<leader>u', group = ' UI Toggles' },
       { '<leader>x', group = ' Diagnostics' },
       { '<leader>z', group = 'Folding', icon = '󰘖 ' },
+      { '<leader>w', '<cmd>NvimWrapped<cr>', desc = 'Wrapped stats' },
       { '[b', desc = 'Prev buffer' },
       { ']b', desc = 'Next buffer' },
       { '<leader>W', group = ' Wrapping' },
