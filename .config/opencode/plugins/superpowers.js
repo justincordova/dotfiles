@@ -1,1 +1,0 @@
-/Users/justincordova/.opencode/superpowers/.opencode/plugins/superpowers.js
