@@ -1,0 +1,9 @@
+.claude/
+.config/claude/history.jsonl
+.config/claude/debug/
+.config/claude/projects/
+.config/claude/file-history/
+.config/claude/cache/
+.config/claude/plugins/marketplaces/
+.config/opencode/projects/
+.config/opencode/history.jsonl
