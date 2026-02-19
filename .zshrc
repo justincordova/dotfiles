@@ -43,6 +43,7 @@ alias obi="cd /Users/justincordova/Library/Mobile\ Documents/iCloud~md~obsidian/
 alias codep='code .. --reuse-window'
 alias cc='claude'
 alias oc='opencode'
+alias dc='dotcor'
 
 # Git
 alias lg="lazygit"
