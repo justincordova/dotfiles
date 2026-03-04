@@ -79,12 +79,12 @@ return {
       vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = 'Recent Files' })
       vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help Tags' })
       vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = 'Find Keymaps' })
-      vim.keymap.set('n', '<leader>fc', require('custom.utils').find_config_files, { desc = 'Config Files' })
+      vim.keymap.set('n', '<leader>fc', require('config.utils').find_config_files, { desc = 'Config Files' })
       vim.keymap.set('n', '<leader>fp', telescope.extensions.project.project, { desc = 'Projects' })
       vim.keymap.set('n', '<leader>fz', telescope.extensions.zoxide.list, { desc = 'Z Directories' })
       vim.keymap.set('n', '<leader>bb', builtin.buffers, { desc = 'List Buffers' })
 
-      -- Colorscheme switcher with preview and persistence
+      -- Colorscheme switcher with preview
       vim.keymap.set('n', '<leader>ut', function()
         builtin.colorscheme {
           enable_preview = true,
@@ -93,8 +93,6 @@ return {
               local selection = require('telescope.actions.state').get_selected_entry()
               require('telescope.actions').close(prompt_bufnr)
               vim.cmd.colorscheme(selection.value)
-              -- Save the selected colorscheme
-              require('custom.utils').save_colorscheme(selection.value)
             end)
             return true
           end,

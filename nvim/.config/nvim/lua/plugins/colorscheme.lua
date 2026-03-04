@@ -31,16 +31,7 @@ return {
     },
     config = function(_, opts)
       require('catppuccin').setup(opts)
-
-      -- Load saved colorscheme or default to catppuccin-mocha
-      local utils = require('custom.utils')
-      local saved_colorscheme = utils.load_saved_colorscheme()
-
-      if saved_colorscheme and saved_colorscheme ~= '' then
-        pcall(vim.cmd.colorscheme, saved_colorscheme)
-      else
-        vim.cmd.colorscheme 'catppuccin-mocha'
-      end
+      vim.cmd.colorscheme 'catppuccin-mocha'
     end,
   },
 

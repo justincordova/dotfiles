@@ -10,7 +10,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- Auto-save on timer (2 seconds after idle) and focus lost
+-- Auto-save on timer (after idle) and focus lost
 vim.api.nvim_create_autocmd({ 'FocusLost', 'CursorHold' }, {
   desc = 'Auto-save on focus lost or after idle',
   group = vim.api.nvim_create_augroup('auto-save', { clear = true }),
@@ -20,6 +20,3 @@ vim.api.nvim_create_autocmd({ 'FocusLost', 'CursorHold' }, {
     end
   end,
 })
-
--- Set updatetime for CursorHold (2000ms = 2 seconds)
-vim.opt.updatetime = 2000

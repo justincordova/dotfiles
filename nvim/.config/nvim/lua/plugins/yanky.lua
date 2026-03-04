@@ -77,12 +77,12 @@ return {
       desc = 'Put yanked text before selection',
     },
     {
-      '<c-p>',
+      '<A-o>',
       '<Plug>(YankyPreviousEntry)',
       desc = 'Select previous entry through yank history',
     },
     {
-      '<c-n>',
+      '<A-i>',
       '<Plug>(YankyNextEntry)',
       desc = 'Select next entry through yank history',
     },
@@ -99,12 +99,12 @@ return {
     {
       ']P',
       '<Plug>(YankyPutIndentAfterLinewise)',
-      desc = 'Put indented after cursor (linewise)',
+      desc = 'Put indented after cursor (linewise, uppercase)',
     },
     {
       '[P',
       '<Plug>(YankyPutIndentBeforeLinewise)',
-      desc = 'Put indented before cursor (linewise)',
+      desc = 'Put indented before cursor (linewise, uppercase)',
     },
     {
       '>p',

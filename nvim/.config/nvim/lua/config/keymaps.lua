@@ -32,7 +32,6 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move line up" })
 -- Buffer navigation
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
--- Note: [b and ]b are defined in barbar.lua
 
 -- Window navigation (will be enhanced by tmux-navigator)
 vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
@@ -79,7 +78,7 @@ vim.keymap.set('n', '<leader>b9', '<Cmd>BufferGoto 9<CR>', { desc = 'Goto buffer
 vim.keymap.set('n', '<leader>b0', '<Cmd>BufferLast<CR>', { desc = 'Goto last buffer' })
 vim.keymap.set('n', '<leader>ba', '<Cmd>BufferCloseAllButCurrent<CR>', { desc = 'Close all but current' })
 vim.keymap.set('n', '<leader>bb', '<Cmd>BufferOrderByBufferNumber<CR>', { desc = 'Sort by buffer number' })
-vim.keymap.set('n', '<leader>bd', '<Cmd>BufferOrderByDirectory<CR>', { desc = 'Sort by directory' })
+vim.keymap.set('n', '<leader>bdi', '<Cmd>BufferOrderByDirectory<CR>', { desc = 'Sort by directory' })
 vim.keymap.set('n', '<leader>bl', '<Cmd>BufferOrderByLanguage<CR>', { desc = 'Sort by language' })
 vim.keymap.set('n', '<leader>bN', '<Cmd>BufferOrderByName<CR>', { desc = 'Sort by name' })
 vim.keymap.set('n', '<leader>bw', '<Cmd>BufferOrderByWindowNumber<CR>', { desc = 'Sort by window number' })
@@ -159,7 +158,7 @@ vim.keymap.set("n", "<leader>\\", "<cmd>vsplit<cr>", { desc = "Split Right" })
 vim.keymap.set("n", "<leader>:", "<cmd>Telescope command_history<cr>", { desc = "Command History" })
 
 -- Scratch
-local scratch = require "custom.scratch"
+local scratch = require "config.scratch"
 scratch.setup()
 vim.keymap.set("n", "<leader>so", scratch.open, { desc = "Open scratch" })
 vim.keymap.set("n", "<leader>se", scratch.export, { desc = "Export scratch" })

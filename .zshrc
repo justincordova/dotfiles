@@ -1,1 +1,0 @@
-../.dotcor/files/dotfiles/.zshrc

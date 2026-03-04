@@ -28,6 +28,21 @@ return {
   deactivate = function()
     vim.cmd([[Neotree close]])
   end,
+  config = function(_, opts)
+    require("neo-tree").setup(opts)
+    local refresh_neo_tree = function()
+      local neo_tree = require("neo-tree")
+      if neo_tree and neo_tree.command then
+        pcall(function()
+          neo_tree.command.execute({ action = "refresh", source = "git_status" })
+          neo_tree.command.execute({ action = "refresh", source = "filesystem" })
+        end)
+      end
+    end
+    vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
+      callback = refresh_neo_tree,
+    })
+  end,
   opts = {
     sources = { "filesystem", "buffers", "git_status" },
     open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },

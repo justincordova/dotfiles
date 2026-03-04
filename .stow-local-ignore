@@ -1,0 +1,4 @@
+^scripts$
+README.*
+\.git.*
+\.gitignore$

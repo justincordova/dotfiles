@@ -6,13 +6,10 @@ return {
     local lint = require 'lint'
 
     lint.linters_by_ft = {
-      javascript = { 'eslint' },
-      typescript = { 'eslint' },
-      javascriptreact = { 'eslint' },
-      typescriptreact = { 'eslint' },
-      python = { 'ruff', 'mypy' },
-      sh = { 'shellcheck' },
-      bash = { 'shellcheck' },
+      -- eslint is handled by the eslint LSP server (see lsp.lua)
+      -- ruff is handled by the ruff LSP server (see lsp.lua)
+      -- shellcheck is handled by bashls LSP server (see lsp.lua)
+      python = { 'mypy' },
       dockerfile = { 'hadolint' },
       gitcommit = { 'gitlint' },
       go = { 'golangcilint' },

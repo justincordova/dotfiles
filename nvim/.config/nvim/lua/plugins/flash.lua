@@ -82,7 +82,7 @@ return {
       desc = 'Flash Treesitter',
     },
     {
-      'r',
+      '<A-r>',
       mode = 'o',
       function()
         require('flash').remote()
