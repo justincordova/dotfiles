@@ -44,6 +44,7 @@ alias codep='code .. --reuse-window'
 alias cc='claude'
 alias oc='opencode'
 alias dc='dotcor'
+alias ne='nvim -c "Neotree reveal" -c "wincmd l" -c "close"'
 
 # Git
 alias lg="lazygit"

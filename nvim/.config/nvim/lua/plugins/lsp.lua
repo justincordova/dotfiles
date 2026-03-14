@@ -86,6 +86,7 @@ return {
             map('<leader>ch', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, 'Toggle Inlay [H]ints')
+            vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
           end
         end,
       })
@@ -99,6 +100,7 @@ return {
         clangd = {},
         cssls = {},
         dockerls = {},
+        docker_compose_language_service = {},
         emmet_ls = {},
         eslint = {
           on_attach = function(client)
@@ -106,6 +108,7 @@ return {
           end,
         },
         gopls = {},
+        jdtls = {},
         graphql = {},
         html = {},
         jsonls = {},
@@ -136,12 +139,34 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities())
 
+      -- Explicitly configure gopls settings via vim.lsp.config (required for Neovim 0.11+)
+      vim.lsp.config('gopls', {
+        settings = {
+          gopls = {
+            analyses = {
+              unusedparams = true,
+              shadow = true,
+            },
+            hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              compositeLiteralTypes = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
+            },
+            staticcheck = true,
+          },
+        },
+      })
+
       -- Setup Mason
       require('mason').setup()
 
       -- Setup mason-lspconfig with handlers (modern approach for Neovim 0.11+)
       require('mason-lspconfig').setup {
-        ensure_installed = vim.tbl_keys(servers),
+        ensure_installed = vim.list_extend(vim.tbl_keys(servers), { 'jdtls' }),
         automatic_installation = true,
         handlers = {
           -- Default handler for all servers

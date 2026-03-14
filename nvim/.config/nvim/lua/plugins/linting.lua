@@ -16,6 +16,8 @@ return {
       -- markdown = { 'vale' },
     }
 
+    lint.linters.golangcilint.ignore_exitcode = true
+
     -- Auto-lint on save and text change
     local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
     vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {

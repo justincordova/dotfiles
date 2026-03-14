@@ -6,7 +6,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 
@@ -18,5 +18,15 @@ vim.api.nvim_create_autocmd({ 'FocusLost', 'CursorHold' }, {
     if vim.g.auto_save_enabled and vim.bo.modified and vim.bo.buftype == '' and vim.fn.expand('%') ~= '' then
       vim.cmd('silent! update')
     end
+  end,
+})
+
+-- Set filetype for docker-compose files
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  desc = 'Detect docker-compose files',
+  group = vim.api.nvim_create_augroup('docker-compose-filetype', { clear = true }),
+  pattern = { 'docker-compose*.yml', 'docker-compose*.yaml', 'compose*.yml', 'compose*.yaml' },
+  callback = function()
+    vim.bo.filetype = 'yaml.docker-compose'
   end,
 })
