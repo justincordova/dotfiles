@@ -21,6 +21,16 @@ vim.api.nvim_create_autocmd({ 'FocusLost', 'CursorHold' }, {
   end,
 })
 
+-- Set conceallevel=2 for markdown (needed by render-markdown and obsidian)
+vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Set conceallevel for markdown files',
+  group = vim.api.nvim_create_augroup('markdown-conceallevel', { clear = true }),
+  pattern = { 'markdown' },
+  callback = function()
+    vim.opt_local.conceallevel = 2
+  end,
+})
+
 -- Set filetype for docker-compose files
 vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Detect docker-compose files',

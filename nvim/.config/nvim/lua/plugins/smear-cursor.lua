@@ -30,10 +30,12 @@ return {
         end
 
         if scroll_timer then
-          vim.loop.timer_stop(scroll_timer)
+          scroll_timer:stop()
+          scroll_timer:close()
+          scroll_timer = nil
         end
 
-        scroll_timer = vim.loop.new_timer()
+        scroll_timer = vim.uv.new_timer()
         scroll_timer:start(100, 0, function()
           vim.schedule(function()
             scroll_count = 0

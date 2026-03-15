@@ -12,7 +12,7 @@ return {
     workspaces = {
       {
         name = 'obi',
-        path = '/Users/justincordova/Library/Mobile Documents/iCloud~md~obsidian/Documents/obi',
+        path = vim.fn.expand('~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obi'),
       },
     },
     daily_notes = {

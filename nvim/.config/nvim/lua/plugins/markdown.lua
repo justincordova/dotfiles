@@ -3,13 +3,13 @@ return {
   -- Render markdown in Neovim
   {
     'MeanderingProgrammer/render-markdown.nvim',
-    ft = { 'markdown', 'md', 'MD' },
+    ft = { 'markdown' },
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
-      'nvim-tree/nvim-web-devicons',
+      { 'nvim-tree/nvim-web-devicons', optional = true },
     },
     opts = {
-      file_types = { 'markdown', 'md', 'MD' },
+      file_types = { 'markdown' },
     },
   },
 
@@ -18,7 +18,7 @@ return {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
     build = 'cd app && npx --yes yarn install',
-    ft = { 'markdown', 'md', 'MD' },
+    ft = { 'markdown' },
     config = function()
       vim.g.mkdp_auto_close = 0
       vim.g.mkdp_open_to_the_world = 0

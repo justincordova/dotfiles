@@ -8,4 +8,8 @@ return {
       return package.loaded['nvim-web-devicons']
     end
   end,
+  specs = {
+    -- Tell lazy.nvim that nvim-web-devicons is provided by mini.icons
+    { 'nvim-tree/nvim-web-devicons', optional = true },
+  },
 }

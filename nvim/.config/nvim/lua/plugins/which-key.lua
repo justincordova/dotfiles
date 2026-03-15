@@ -6,7 +6,7 @@ return {
   'folke/which-key.nvim',
   event = 'VeryLazy',
   dependencies = {
-    'nvim-tree/nvim-web-devicons',
+    { 'nvim-tree/nvim-web-devicons', optional = true },
   },
   opts = {
     notify = false, -- Disable which-key notifications to reduce noise
@@ -31,8 +31,6 @@ return {
         { pattern = "Rename", icon = "󰑕 ", color = "cyan" },
         { pattern = "fold", icon = " ", color = "purple" },
         { pattern = "Fold", icon = " ", color = "purple" },
-        { pattern = "Claude", icon = "󰚩 ", color = "purple" },
-        { pattern = "OpenCode", icon = "󰚩 ", color = "purple" },
       },
       keys = vim.g.have_nerd_font and {} or {
         Up = '<Up> ',
@@ -66,16 +64,16 @@ return {
       },
     },
     spec = {
-      { '<leader>a', group = ' Claude' },
+
       { '<leader>b', group = ' Buffers' },
       { '<leader>c', group = ' Code' },
+      { '<leader>d', group = ' Debug' },
       { '<leader>f', group = ' Find' },
       { '<leader>g', group = ' Git' },
-      { '<leader>o', group = ' OpenCode' },
+      { '<leader>o', group = ' Octo/GitHub' },
       { '<leader>q', group = ' Quit/Session' },
-      { '<leader>r', group = ' Rename', icon = '󰑕 ' },
-      { '<leader>S', group = '󰂶 Screensaver' },
-      { '<leader>s', group = ' Search' },
+      { '<leader>s', group = ' Search/Scratch' },
+      { '<leader>w', group = ' Windows' },
       { '<leader>u', group = ' UI Toggles' },
       { '<leader>x', group = ' Diagnostics' },
       { '<leader>z', group = 'Folding', icon = '󰘖 ' },
@@ -95,11 +93,8 @@ return {
       { '<M-0>', desc = 'Goto last buffer', icon = '󰓩 ' },
       { '<M-p>', desc = 'Pin buffer', icon = '󰓩 ' },
       { '<M-c>', desc = 'Close buffer', icon = '󰓩 ' },
-      { '<C-p>', desc = 'Pick buffer', icon = '󰓩 ' },
       { '<C-s-p>', desc = 'Pick & delete buffer', icon = '󰓩 ' },
-      { '[b', desc = 'Prev buffer' },
-      { ']b', desc = 'Next buffer' },
-      { '<leader>W', group = ' Wrapping' },
+
       -- Explicit icons for specific mappings
       { '<leader>e', icon = ' ' }, -- Explorer
       { '<leader>E', icon = ' ' }, -- Explorer
@@ -121,13 +116,26 @@ return {
       { 'zm', desc = 'Fold more' },
       { 'zp', desc = 'Peek fold' },
       -- Wrapping keybindings (from wrapping.nvim plugin)
-      { '[ow', desc = 'Soft wrap mode', icon = '󰗘 ' },
-      { ']ow', desc = 'Hard wrap mode', icon = '󰙘 ' },
-      { 'yow', desc = 'Toggle wrap mode', icon = '󰘚 ' },
-      -- Custom leader keybindings for wrapping
-      { '<leader>Ws', desc = 'Soft wrap mode', icon = '󰗘 ' },
-      { '<leader>Wh', desc = 'Hard wrap mode', icon = '󰙘 ' },
-      { '<leader>Wt', desc = 'Toggle wrap mode', icon = '󰘚 ' },
+      { '[ou', desc = 'Soft wrap mode', icon = '󰗘 ' },
+      { ']ou', desc = 'Hard wrap mode', icon = '󰙘 ' },
+      { 'you', desc = 'Toggle wrap mode', icon = '󰘚 ' },
+      -- UI toggles
+      { '<leader>ua', desc = 'Toggle auto-save' },
+      { '<leader>ud', desc = 'Dismiss all notifications' },
+      -- Code (LSP)
+      { '<leader>ci', desc = 'Toggle inlay hints' },
+      -- Debug
+      { '<leader>db', desc = 'Toggle breakpoint' },
+      { '<leader>dB', desc = 'Conditional breakpoint' },
+      { '<leader>dc', desc = 'Continue' },
+      { '<leader>ds', desc = 'Step over' },
+      { '<leader>di', desc = 'Step into' },
+      { '<leader>do', desc = 'Step out' },
+      { '<leader>dr', desc = 'Open REPL' },
+      { '<leader>dl', desc = 'Run last' },
+      { '<leader>dt', desc = 'Terminate' },
+      { '<leader>du', desc = 'Toggle DAP UI' },
+      { '<leader>de', desc = 'Eval expression' },
     },
   },
 }

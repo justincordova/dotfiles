@@ -4,6 +4,7 @@ return {
   {
     'catppuccin/nvim',
     name = 'catppuccin',
+    lazy = false,
     priority = 1000,
     opts = {
       flavour = 'mocha', -- latte, frappe, macchiato, mocha
@@ -38,7 +39,7 @@ return {
   -- GitHub Themes
   {
     'projekt0n/github-nvim-theme',
-    lazy = false,
+    lazy = true,
     priority = 999,
     config = function()
       require('github-theme').setup {

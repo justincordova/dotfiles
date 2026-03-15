@@ -1,7 +1,7 @@
 -- [[ Lualine Statusline ]]
 return {
   'nvim-lualine/lualine.nvim',
-  dependencies = { 'nvim-tree/nvim-web-devicons' },
+  dependencies = { { 'nvim-tree/nvim-web-devicons', optional = true } },
   opts = function()
     local colors = {
       purple = '#cba6f7', -- Mauve

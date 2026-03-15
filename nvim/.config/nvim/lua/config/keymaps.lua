@@ -42,7 +42,7 @@ vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper win
 -- Buffer Management (Leader b)
 vim.keymap.set("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })
 vim.keymap.set("n", "<leader>bd", "<cmd>BufferClose<cr>", { desc = "Delete buffer" })
-vim.keymap.set("n", "<leader>bD", "<cmd>BufferClose<cr>", { desc = "Delete buffer (force)" })
+vim.keymap.set("n", "<leader>bD", "<cmd>BufferClose!<cr>", { desc = "Delete buffer (force)" })
 vim.keymap.set("n", "<leader>bo", "<cmd>BufferCloseAllButCurrent<CR>", { desc = "Delete other buffers" })
 vim.keymap.set("n", "<leader>bp", "<cmd>BufferPick<CR>", { desc = "Pick buffer" })
 vim.keymap.set("n", "<leader>bP", "<cmd>BufferPin<CR>", { desc = "Pin buffer" })
@@ -64,7 +64,6 @@ vim.keymap.set('n', '<A-9>', '<Cmd>BufferGoto 9<CR>', { desc = 'Goto buffer 9' }
 vim.keymap.set('n', '<A-0>', '<Cmd>BufferLast<CR>', { desc = 'Goto last buffer' })
 vim.keymap.set('n', '<A-p>', '<Cmd>BufferPin<CR>', { desc = 'Pin buffer' })
 vim.keymap.set('n', '<A-c>', '<Cmd>BufferClose<CR>', { desc = 'Close buffer' })
-vim.keymap.set('n', '<C-p>', '<Cmd>BufferPick<CR>', { desc = 'Pick buffer' })
 vim.keymap.set('n', '<C-s-p>', '<Cmd>BufferPickDelete<CR>', { desc = 'Pick & delete buffer' })
 vim.keymap.set('n', '<leader>b1', '<Cmd>BufferGoto 1<CR>', { desc = 'Goto buffer 1' })
 vim.keymap.set('n', '<leader>b2', '<Cmd>BufferGoto 2<CR>', { desc = 'Goto buffer 2' })
@@ -76,14 +75,11 @@ vim.keymap.set('n', '<leader>b7', '<Cmd>BufferGoto 7<CR>', { desc = 'Goto buffer
 vim.keymap.set('n', '<leader>b8', '<Cmd>BufferGoto 8<CR>', { desc = 'Goto buffer 8' })
 vim.keymap.set('n', '<leader>b9', '<Cmd>BufferGoto 9<CR>', { desc = 'Goto buffer 9' })
 vim.keymap.set('n', '<leader>b0', '<Cmd>BufferLast<CR>', { desc = 'Goto last buffer' })
-vim.keymap.set('n', '<leader>ba', '<Cmd>BufferCloseAllButCurrent<CR>', { desc = 'Close all but current' })
-vim.keymap.set('n', '<leader>bb', '<Cmd>BufferOrderByBufferNumber<CR>', { desc = 'Sort by buffer number' })
 vim.keymap.set('n', '<leader>bdi', '<Cmd>BufferOrderByDirectory<CR>', { desc = 'Sort by directory' })
 vim.keymap.set('n', '<leader>bl', '<Cmd>BufferOrderByLanguage<CR>', { desc = 'Sort by language' })
 vim.keymap.set('n', '<leader>bN', '<Cmd>BufferOrderByName<CR>', { desc = 'Sort by name' })
 vim.keymap.set('n', '<leader>bw', '<Cmd>BufferOrderByWindowNumber<CR>', { desc = 'Sort by window number' })
 vim.keymap.set('n', '<leader>bC', '<Cmd>BufferRestore<CR>', { desc = 'Restore buffer' })
-vim.keymap.set('n', '<leader>bc', '<Cmd>BufferClose<CR>', { desc = 'Close buffer' })
 
 -- Window Management (Leader w)
 vim.keymap.set("n", "<leader>wv", "<cmd>vsplit<cr>", { desc = "Split vertical" })
@@ -104,7 +100,7 @@ vim.keymap.set("n", "<leader>us", "<cmd>set spell!<cr>", { desc = "Toggle spell 
 
 -- Quick Actions
 vim.keymap.set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
-vim.keymap.set("n", "<leader>cs", function()
+vim.keymap.set("n", "<leader>ua", function()
   vim.g.auto_save_enabled = not vim.g.auto_save_enabled
   if vim.g.auto_save_enabled then
     vim.notify("Auto-save enabled", vim.log.levels.INFO, { title = "Auto-save" })
@@ -117,7 +113,7 @@ vim.keymap.set("n", "<leader>h", function()
   local health_buf = nil
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     local bufname = vim.api.nvim_buf_get_name(bufnr)
-    if bufname:match("checkhealth") or vim.bo[bufnr].filetype == "checkhealth" then
+    if bufname:match("health://") or vim.bo[bufnr].filetype == "checkhealth" then
       health_buf = bufnr
       break
     end
@@ -151,7 +147,9 @@ vim.keymap.set("n", "<leader>h", function()
   vim.bo[health_buf].bufhidden = "wipe"
 end, { desc = "Check Health" })
 vim.keymap.set("n", "<leader>cm", "<cmd>Mason<cr>", { desc = "Mason" })
-vim.keymap.set("n", "<leader>gg", ":!tmux new-window -c " .. vim.fn.getcwd() .. " -- lazygit <CR><CR>", { silent = true, desc = "LazyGit" })
+vim.keymap.set("n", "<leader>gg", function()
+  vim.cmd("silent !tmux new-window -c " .. vim.fn.getcwd() .. " -- lazygit")
+end, { desc = "LazyGit" })
 vim.keymap.set("n", "<leader>,", "<cmd>Telescope buffers<cr>", { desc = "Switch Buffer" })
 vim.keymap.set("n", "<leader>-", "<cmd>split<cr>", { desc = "Split Below" })
 vim.keymap.set("n", "<leader>\\", "<cmd>vsplit<cr>", { desc = "Split Right" })

@@ -4,14 +4,14 @@ return {
   version = "*",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-tree/nvim-web-devicons",
+    { "nvim-tree/nvim-web-devicons", optional = true },
     "MunifTanjim/nui.nvim",
   },
   cmd = "Neotree",
   init = function()
     -- If we open a directory (e.g. nvim .), load neo-tree immediately
     if vim.fn.argc() == 1 then
-      local stat = vim.loop.fs_stat(vim.fn.argv(0))
+      local stat = vim.uv.fs_stat(vim.fn.argv(0))
       if stat and stat.type == "directory" then
         require("neo-tree")
       end
@@ -20,8 +20,6 @@ return {
   keys = {
     { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Explorer (root dir)" },
     { "<leader>E", "<cmd>Neotree toggle dir=%:p:h<cr>", desc = "Explorer (cwd)" },
-    { "<leader>fe", "<cmd>Neotree toggle<cr>", desc = "Explorer (root dir)" },
-    { "<leader>fE", "<cmd>Neotree toggle dir=%:p:h<cr>", desc = "Explorer (cwd)" },
     { "<leader>ge", "<cmd>Neotree git_status<cr>", desc = "Git Explorer" },
     { "<leader>be", "<cmd>Neotree buffers<cr>", desc = "Buffer Explorer" },
   },
@@ -39,7 +37,7 @@ return {
         end)
       end
     end
-    vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
+    vim.api.nvim_create_autocmd('FocusGained', {
       callback = refresh_neo_tree,
     })
   end,

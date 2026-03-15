@@ -14,7 +14,7 @@ return {
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', optional = true },
       { 'nvim-telescope/telescope-project.nvim' },
       { 'nanotee/zoxide.vim' }, -- Dependency for telescope-z
       { 'jvgrootveld/telescope-zoxide' },
@@ -72,7 +72,7 @@ return {
       pcall(telescope.load_extension, 'notify')
 
       -- Telescope keybindings (Leader f - Find)
-      vim.keymap.set('n', '<leader><space>', builtin.find_files, { desc = 'Find Files (Root)' })
+      vim.keymap.set('n', '<leader><space>', builtin.find_files, { desc = 'Find Files' })
       vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find Files' })
       vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Live Grep' })
       vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find Buffers' })
@@ -82,8 +82,6 @@ return {
       vim.keymap.set('n', '<leader>fc', require('config.utils').find_config_files, { desc = 'Config Files' })
       vim.keymap.set('n', '<leader>fp', telescope.extensions.project.project, { desc = 'Projects' })
       vim.keymap.set('n', '<leader>fz', telescope.extensions.zoxide.list, { desc = 'Z Directories' })
-      vim.keymap.set('n', '<leader>bb', builtin.buffers, { desc = 'List Buffers' })
-
       -- Colorscheme switcher with preview
       vim.keymap.set('n', '<leader>ut', function()
         builtin.colorscheme {

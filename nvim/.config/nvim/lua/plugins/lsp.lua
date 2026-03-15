@@ -38,7 +38,7 @@ return {
 
       -- This function runs when an LSP attaches to a buffer
       vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = false }),
         callback = function(event)
           local map = function(keys, func, desc)
             vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
@@ -51,7 +51,9 @@ return {
           map('<leader>cd', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
           map('<leader>cs', require('telescope.builtin').lsp_document_symbols, 'Document [S]ymbols')
           map('<leader>cw', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace Symbols')
-          map('<leader>cr', vim.lsp.buf.rename, '[R]ename')
+          vim.keymap.set('n', '<leader>cr', function()
+            return ':IncRename ' .. vim.fn.expand '<cword>'
+          end, { buffer = event.buf, expr = true, desc = 'LSP: [R]ename' })
           map('<leader>ca', vim.lsp.buf.code_action, 'Code [A]ction')
           map('K', vim.lsp.buf.hover, 'Hover Documentation')
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -83,9 +85,12 @@ return {
 
           -- Inlay hints toggle
           if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            map('<leader>ch', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, 'Toggle Inlay [H]ints')
+            map('<leader>ci', function()
+              vim.lsp.inlay_hint.enable(
+                not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf },
+                { bufnr = event.buf }
+              )
+            end, 'Toggle [I]nlay Hints')
             vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
           end
         end,
@@ -107,7 +112,26 @@ return {
             client.server_capabilities.documentFormattingProvider = false
           end,
         },
-        gopls = {},
+        gopls = {
+          settings = {
+            gopls = {
+              analyses = {
+                unusedparams = true,
+                shadow = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              staticcheck = true,
+            },
+          },
+        },
         jdtls = {},
         graphql = {},
         html = {},
@@ -139,34 +163,12 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities())
 
-      -- Explicitly configure gopls settings via vim.lsp.config (required for Neovim 0.11+)
-      vim.lsp.config('gopls', {
-        settings = {
-          gopls = {
-            analyses = {
-              unusedparams = true,
-              shadow = true,
-            },
-            hints = {
-              assignVariableTypes = true,
-              compositeLiteralFields = true,
-              compositeLiteralTypes = true,
-              constantValues = true,
-              functionTypeParameters = true,
-              parameterNames = true,
-              rangeVariableTypes = true,
-            },
-            staticcheck = true,
-          },
-        },
-      })
-
       -- Setup Mason
       require('mason').setup()
 
       -- Setup mason-lspconfig with handlers (modern approach for Neovim 0.11+)
       require('mason-lspconfig').setup {
-        ensure_installed = vim.list_extend(vim.tbl_keys(servers), { 'jdtls' }),
+        ensure_installed = vim.tbl_keys(servers),
         automatic_installation = true,
         handlers = {
           -- Default handler for all servers

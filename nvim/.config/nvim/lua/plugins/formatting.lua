@@ -7,7 +7,7 @@ return {
     {
       '<leader>cf',
       function()
-        require('conform').format { async = true, lsp_fallback = true }
+        require('conform').format { async = true, lsp_format = 'fallback' }
       end,
       desc = 'Format buffer',
     },
@@ -21,7 +21,7 @@ return {
       end
       return {
         timeout_ms = 500,
-        lsp_fallback = true,
+        lsp_format = 'fallback',
       }
     end,
     formatters_by_ft = {

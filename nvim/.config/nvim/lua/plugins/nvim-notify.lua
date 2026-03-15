@@ -3,7 +3,7 @@ return {
   'rcarriga/nvim-notify',
   keys = {
     {
-      '<leader>un',
+      '<leader>ud',
       function()
         require('notify').dismiss { silent = true, pending = true }
       end,
@@ -33,42 +33,17 @@ return {
               end
             end)
 
-            -- Press Enter to open notification in a readable buffer
-            map('i', '<CR>', function()
-              local selection = action_state.get_selected_entry()
-              if not selection then
-                return
-              end
-
-              -- Create a scratch buffer with the notification
-              local buf = vim.api.nvim_create_buf(false, true)
-              vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-              vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
-              vim.api.nvim_buf_set_option(buf, 'filetype', 'markdown')
-
-              -- Split the message into lines
-              local lines = vim.split(selection.value.message, '\n')
-              vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-
-              -- Open in a split
-              vim.cmd('split')
-              vim.api.nvim_win_set_buf(0, buf)
-              vim.api.nvim_win_set_height(0, math.min(#lines + 2, 15))
-
-              -- Close with q
-              vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, silent = true })
-            end)
-
-            map('n', '<CR>', function()
+            -- Open notification in a readable scratch buffer
+            local function open_notification_buffer()
               local selection = action_state.get_selected_entry()
               if not selection then
                 return
               end
 
               local buf = vim.api.nvim_create_buf(false, true)
-              vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-              vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
-              vim.api.nvim_buf_set_option(buf, 'filetype', 'markdown')
+              vim.bo[buf].buftype = 'nofile'
+              vim.bo[buf].bufhidden = 'wipe'
+              vim.bo[buf].filetype = 'markdown'
 
               local lines = vim.split(selection.value.message, '\n')
               vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -78,7 +53,10 @@ return {
               vim.api.nvim_win_set_height(0, math.min(#lines + 2, 15))
 
               vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, silent = true })
-            end)
+            end
+
+            map('i', '<CR>', open_notification_buffer)
+            map('n', '<CR>', open_notification_buffer)
 
             return true -- Keep default mappings except what we overrode
           end,

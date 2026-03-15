@@ -54,11 +54,6 @@ return {
         gitsigns.blame_line { full = true }
       end, { desc = 'Blame line' })
       map('n', '<leader>gB', gitsigns.toggle_current_line_blame, { desc = 'Toggle line blame' })
-      map('n', '<leader>gd', gitsigns.diffthis, { desc = 'Diff this' })
-      map('n', '<leader>gD', function()
-        gitsigns.diffthis '~'
-      end, { desc = 'Diff this ~' })
-
       -- Text object
       map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'Select hunk' })
     end,

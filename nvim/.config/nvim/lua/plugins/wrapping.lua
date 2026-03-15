@@ -21,10 +21,10 @@ return {
       softener = {
         markdown = true,    -- Always soft wrap markdown
         text = true,        -- Always soft wrap plain text
-        asciidoc = true,    -- Always soft wrap asciidoc
-        gitcommit = true,     -- Always soft wrap git commits
-        rst = true,          -- Always soft wrap reStructuredText
-        mail = true,         -- Always soft wrap emails
+        asciidoc = false,   -- Hard wrap asciidoc by default
+        gitcommit = false,  -- Hard wrap git commits by default
+        rst = false,        -- Hard wrap reStructuredText by default
+        mail = false,       -- Hard wrap emails by default
       },
       -- Ensure wrapping breaks only at word boundaries (not mid-word)
       set_nvim_opt_defaults = true,

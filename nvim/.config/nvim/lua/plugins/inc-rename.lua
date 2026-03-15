@@ -19,14 +19,5 @@ return {
       post_hook = nil,
     }
   end,
-  keys = {
-    {
-      '<leader>rn',
-      function()
-        return ':IncRename ' .. vim.fn.expand '<cword>'
-      end,
-      expr = true,
-      desc = 'Rename (incremental)',
-    },
-  },
+
 }

@@ -83,6 +83,7 @@ function M.export()
   local date_prefix = os.date "%Y-%m-%d"
 
   vim.ui.input({ prompt = "Scratch title: " }, function(input)
+    if input == nil then return end -- user cancelled
     local slug = slugify_title(input)
     if slug == "" then
       slug = "scratch"
@@ -132,10 +133,6 @@ end
 
 function M.setup()
   vim.api.nvim_create_user_command("Scratch", function()
-    M.open()
-  end, {})
-
-  vim.api.nvim_create_user_command("NvimScratch", function()
     M.open()
   end, {})
 

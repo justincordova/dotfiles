@@ -10,7 +10,7 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 
 -- Set python3 host
-vim.g.python3_host_prog = "/opt/homebrew/bin/python3"
+vim.g.python3_host_prog = vim.fn.exepath('python3')
 
 -- Font
 vim.opt.guifont = 'JetBrainsMono Nerd Font:h12'
@@ -71,8 +71,7 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor
 vim.opt.scrolloff = 10
 
--- Conceallevel for plugins that hide markup
-vim.opt.conceallevel = 2
+-- conceallevel is set per-filetype in autocmds (markdown/obsidian need 2, others stay at 0)
 
 -- Tab settings
 vim.opt.tabstop = 2
@@ -86,7 +85,6 @@ vim.opt.wildoptions = 'pum' -- Popup menu for command-line completion
 
 -- Wrap settings (wrapping.nvim will toggle this for text files)
 vim.opt.wrap = false
-vim.opt.linebreak = true -- Break at word boundaries, not mid-word
 
 -- Auto-save toggle (global state)
 vim.g.auto_save_enabled = false
