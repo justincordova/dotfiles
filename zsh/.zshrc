@@ -53,6 +53,7 @@ alias lg="lazygit"
 alias py3='python3'
 alias py='python'
 alias fishy="asciiquarium"
+alias ghd='gh dash'
 
 # --- Functions ---
 mkcd() { mkdir -p "$1" && cd "$1"; }
