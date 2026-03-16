@@ -45,6 +45,7 @@ vim.keymap.set("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })
 vim.keymap.set("n", "<leader>bd", "<cmd>BufferClose<cr>", { desc = "Delete buffer" })
 vim.keymap.set("n", "<leader>bD", "<cmd>BufferClose!<cr>", { desc = "Delete buffer (force)" })
 vim.keymap.set("n", "<leader>bo", "<cmd>BufferCloseAllButCurrent<CR>", { desc = "Delete other buffers" })
+vim.keymap.set("n", "<leader>bx", "<cmd>BufferCloseAll<CR>", { desc = "Delete all buffers" })
 vim.keymap.set("n", "<leader>bp", "<cmd>BufferPick<CR>", { desc = "Pick buffer" })
 vim.keymap.set("n", "<leader>bP", "<cmd>BufferPin<CR>", { desc = "Pin buffer" })
 

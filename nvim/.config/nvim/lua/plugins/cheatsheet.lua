@@ -63,6 +63,7 @@ local lines = {
   "  n      <leader>bd       Delete buffer",
   "  n      <leader>bD       Delete buffer (force)",
   "  n      <leader>bo       Delete other buffers",
+  "  n      <leader>bx       Delete all buffers",
   "  n      <leader>bp       Pick buffer",
   "  n      <leader>bP       Pin buffer",
   "  n      <leader>bC       Restore buffer",
