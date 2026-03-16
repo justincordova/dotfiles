@@ -103,6 +103,10 @@ return {
       { '<leader>\\', icon = ' ' }, -- Split Right
       { '<leader>:', icon = ' ' }, -- Command History
       { '<leader>h', icon = ' ' }, -- Check Health
+      { '<leader><space>', desc = 'Find files', icon = '󰈞 ' },
+      { '<leader>,', desc = 'Switch buffer', icon = '󰓩 ' },
+      { '<leader>.', desc = 'Notification history', icon = '󰦨 ' },
+      { '<leader>p', desc = 'Yank history', icon = '󰅇 ' },
       -- Folding keybindings (basic vim + nvim-ufo enhanced)
       { 'z', group = 'Fold' },
       { 'za', desc = 'Toggle fold' },
@@ -136,6 +140,8 @@ return {
       { '<leader>dt', desc = 'Terminate' },
       { '<leader>du', desc = 'Toggle DAP UI' },
       { '<leader>de', desc = 'Eval expression' },
+      { '<leader>y', desc = 'Copy file to clipboard', icon = '󰆏 ' },
+      { '<leader>?', desc = 'Keybind cheatsheet', icon = '󰌌 ' },
     },
   },
 }
