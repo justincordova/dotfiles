@@ -38,6 +38,7 @@ return {
           'tsx',
           'typescript',
           'vim',
+          'xml',
           'yaml',
         },
         auto_install = true,

@@ -28,6 +28,9 @@ vim.opt.showmode = false
 -- Sync clipboard between OS and Neovim
 vim.opt.clipboard = 'unnamedplus'
 
+-- Handle both Unix and Windows line endings
+vim.opt.fileformats = 'unix,dos'
+
 -- Enable break indent
 vim.opt.breakindent = true
 

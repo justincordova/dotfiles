@@ -40,3 +40,13 @@ vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
     vim.bo.filetype = 'yaml.docker-compose'
   end,
 })
+
+-- Set filetype for XAML files
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  desc = 'Detect XAML files',
+  group = vim.api.nvim_create_augroup('xaml-filetype', { clear = true }),
+  pattern = { '*.xaml' },
+  callback = function()
+    vim.bo.filetype = 'xml'
+  end,
+})
