@@ -44,7 +44,18 @@ alias codep='code .. --reuse-window'
 alias cc='claude'
 alias oc='opencode'
 alias dc='dotcor'
-alias ne='nvim -c "Neotree reveal" -c "wincmd l" -c "close"'
+ne() {
+  if [[ -n "$1" ]]; then
+    if [[ -d "$1" ]]; then
+      nvim -c "cd $1" -c "Neotree reveal" -c "wincmd l" -c "close"
+    else
+      echo "Error: '$1' is not a directory"
+      return 1
+    fi
+  else
+    nvim -c "Neotree reveal" -c "wincmd l" -c "close"
+  fi
+}
 
 # Git
 alias lg="lazygit"
