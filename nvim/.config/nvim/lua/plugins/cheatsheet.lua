@@ -195,7 +195,7 @@ local lines = {
   "",
   "Other",
   "  n      <leader>gg       LazyGit (new tmux window)",
-  "  n      <leader>gd       Code diff",
+  "  n      <leader>gd       Diff view",
   "  n      <leader>ge       Git explorer (neo-tree)",
   "",
   "──────────────────────────────────────────────────",
