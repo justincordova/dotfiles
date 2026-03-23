@@ -105,4 +105,34 @@ return {
       require('rose-pine').setup(opts)
     end,
   },
+
+  -- Kanso
+  {
+    'webhooked/kanso.nvim',
+    lazy = false,
+    priority = 999,
+    opts = {
+      bold = true,
+      italics = true,
+      compile = false,
+      undercurl = true,
+      commentStyle = { italic = true },
+      functionStyle = {},
+      keywordStyle = { italic = true },
+      statementStyle = {},
+      typeStyle = {},
+      transparent = false,
+      dimInactive = false,
+      terminalColors = true,
+      background = {
+        dark = 'ink',
+        light = 'pearl',
+      },
+      foreground = 'default',
+      minimal = false,
+    },
+    config = function(_, opts)
+      require('kanso').setup(opts)
+    end,
+  },
 }
