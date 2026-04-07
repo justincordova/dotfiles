@@ -15,8 +15,7 @@ return {
       -- Lua LSP configuration for Neovim
       { 'folke/lazydev.nvim', ft = 'lua', opts = {} },
     },
-    config = function()
-      -- Diagnostic Config
+    init = function()
       vim.diagnostic.config {
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
@@ -35,7 +34,8 @@ return {
           },
         },
       }
-
+    end,
+    config = function()
       -- This function runs when an LSP attaches to a buffer
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('lsp-attach', { clear = false }),
