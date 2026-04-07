@@ -46,6 +46,27 @@ return {
   config = function(_, opts)
     require('barbar').setup(opts)
 
+    vim.api.nvim_create_user_command('BufferCloseAll', function()
+      local buffers = vim.api.nvim_list_bufs()
+      for i = #buffers, 1, -1 do
+        local buf = buffers[i]
+        if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+          pcall(vim.api.nvim_buf_delete, buf, { force = true })
+        end
+      end
+      local has_neo_tree = false
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        local name = vim.api.nvim_buf_get_name(buf)
+        if name:match("neo%-tree") then
+          has_neo_tree = true
+          break
+        end
+      end
+      if not has_neo_tree then
+        vim.cmd('enew')
+      end
+    end, { desc = 'Close all buffers' })
+
     vim.api.nvim_create_autocmd('BufWinEnter', {
       pattern = 'neo-tree*',
       callback = function()

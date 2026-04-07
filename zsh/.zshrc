@@ -34,7 +34,10 @@ if [ $? -eq 0 ]; then eval "$__conda_setup"; elif [ -f "/opt/anaconda3/etc/profi
 # --- Aliases ---
 alias c='clear'
 alias reload='source ~/.zshrc'
-alias ls='ls -G'
+alias ls='eza'
+alias ll='eza -la'
+alias l='eza -l'
+alias lt='eza --tree'
 
 # Navigation
 alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/"
