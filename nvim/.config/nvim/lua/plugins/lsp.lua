@@ -96,88 +96,87 @@ return {
         end,
       })
 
-      -- LSP servers and their configurations
+      -- Servers to install via Mason and auto-enable via vim.lsp.enable()
       local servers = {
-        angularls = {
-          root_dir = require('lspconfig.util').root_pattern 'angular.json',
-        },
-        bashls = {},
-        clangd = {},
-        cssls = {},
-        dockerls = {},
-        docker_compose_language_service = {},
-        emmet_ls = {},
-        eslint = {
-          on_attach = function(client)
-            client.server_capabilities.documentFormattingProvider = false
-          end,
-        },
-        gopls = {
-          settings = {
-            gopls = {
-              analyses = {
-                unusedparams = true,
-                shadow = true,
-              },
-              hints = {
-                assignVariableTypes = true,
-                compositeLiteralFields = true,
-                compositeLiteralTypes = true,
-                constantValues = true,
-                functionTypeParameters = true,
-                parameterNames = true,
-                rangeVariableTypes = true,
-              },
-              staticcheck = true,
-            },
-          },
-        },
-        jdtls = {},
-        graphql = {},
-        html = {},
-        jsonls = {},
-        lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-              diagnostics = {
-                globals = { 'vim' },
-              },
-            },
-          },
-        },
-        omnisharp = {},
-        postgres_lsp = {},
-        prismals = {},
-        pyright = {},
-        ruff = {},
-        rust_analyzer = {},
-        tailwindcss = {},
-        taplo = {},
-        vtsls = {},
+        'angularls',
+        'bashls',
+        'clangd',
+        'cssls',
+        'dockerls',
+        'docker_compose_language_service',
+        'emmet_ls',
+        'eslint',
+        'gopls',
+        'jdtls',
+        'graphql',
+        'html',
+        'jsonls',
+        'lua_ls',
+        'omnisharp',
+        'postgres_lsp',
+        'prismals',
+        'pyright',
+        'ruff',
+        'rust_analyzer',
+        'tailwindcss',
+        'taplo',
+        'vtsls',
       }
 
-      -- Setup default capabilities for completion
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities())
+      -- Default capabilities for every server (blink.cmp + Neovim defaults)
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
+      vim.lsp.config('*', { capabilities = capabilities })
 
-      -- Setup Mason
-      require('mason').setup()
+      -- Per-server overrides via vim.lsp.config (Neovim 0.11+ API)
+      vim.lsp.config('angularls', {
+        root_markers = { 'angular.json' },
+      })
 
-      -- Setup mason-lspconfig with handlers (modern approach for Neovim 0.11+)
-      require('mason-lspconfig').setup {
-        ensure_installed = vim.tbl_keys(servers),
-        automatic_installation = true,
-        handlers = {
-          -- Default handler for all servers
-          function(server_name)
-            local server_config = servers[server_name] or {}
-            server_config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server_config.capabilities or {})
-            require('lspconfig')[server_name].setup(server_config)
-          end,
+      vim.lsp.config('eslint', {
+        on_attach = function(client)
+          client.server_capabilities.documentFormattingProvider = false
+        end,
+      })
+
+      vim.lsp.config('gopls', {
+        settings = {
+          gopls = {
+            analyses = {
+              unusedparams = true,
+              shadow = true,
+            },
+            hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              compositeLiteralTypes = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
+            },
+            staticcheck = true,
+          },
         },
+      })
+
+      vim.lsp.config('lua_ls', {
+        settings = {
+          Lua = {
+            completion = {
+              callSnippet = 'Replace',
+            },
+            diagnostics = {
+              globals = { 'vim' },
+            },
+          },
+        },
+      })
+
+      -- Mason + mason-lspconfig v2: ensure_installed + automatic_enable only
+      require('mason').setup()
+      require('mason-lspconfig').setup {
+        ensure_installed = servers,
+        automatic_enable = true,
       }
     end,
   },
