@@ -50,13 +50,13 @@ alias dc='dotcor'
 ne() {
   if [[ -n "$1" ]]; then
     if [[ -d "$1" ]]; then
-      nvim -c "cd $1" -c "Neotree reveal" -c "wincmd l" -c "close"
+      NVIM_NO_DASHBOARD=1 nvim -c "cd $1" -c "Neotree reveal" -c "wincmd l" -c "close" -c "1bwipeout"
     else
       echo "Error: '$1' is not a directory"
       return 1
     fi
   else
-    nvim -c "Neotree reveal" -c "wincmd l" -c "close"
+    NVIM_NO_DASHBOARD=1 nvim -c "Neotree reveal" -c "wincmd l" -c "close" -c "1bwipeout"
   fi
 }
 

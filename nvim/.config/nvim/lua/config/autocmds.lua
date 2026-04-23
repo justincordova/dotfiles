@@ -41,6 +41,16 @@ vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   end,
 })
 
+vim.api.nvim_create_autocmd('QuitPre', {
+  desc = 'Close Neo-tree before quitting to avoid buftype errors',
+  group = vim.api.nvim_create_augroup('neotree-quit', { clear = true }),
+  callback = function()
+    pcall(function()
+      vim.cmd('Neotree close')
+    end)
+  end,
+})
+
 -- Set filetype for XAML files
 vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   desc = 'Detect XAML files',

@@ -70,6 +70,8 @@ return {
         ["l"] = "open",
         ["h"] = "close_node",
         ["<space>"] = "none",
+        ["q"] = "close_window",
+        ["<C-q>"] = function() vim.cmd("xa") end,
         ["Y"] = {
           function(state)
             local node = state.tree:get_node()

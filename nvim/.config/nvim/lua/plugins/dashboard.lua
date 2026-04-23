@@ -1,6 +1,7 @@
 -- [[ Dashboard Configuration ]]
 return {
   'nvimdev/dashboard-nvim',
+  cond = function() return not vim.env.NVIM_NO_DASHBOARD end,
   event = 'VimEnter',
   opts = function()
     local logo = [[
