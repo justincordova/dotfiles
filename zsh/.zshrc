@@ -86,3 +86,4 @@ if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty
   tmux attach -t main || tmux new -s main
 fi
 export PATH="$HOME/.local/bin:$PATH"
+export TERM=xterm-256color
