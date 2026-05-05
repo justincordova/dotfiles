@@ -62,6 +62,7 @@ ne() {
 
 # Git
 alias lg="lazygit"
+alias gmp="git checkout main && git pull"
 
 # Dev / Misc
 alias py3='python3'
@@ -87,3 +88,6 @@ if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty
 fi
 export PATH="$HOME/.local/bin:$PATH"
 export TERM=xterm-256color
+
+# bun completions
+[ -s "/Users/justincordova/.bun/_bun" ] && source "/Users/justincordova/.bun/_bun"

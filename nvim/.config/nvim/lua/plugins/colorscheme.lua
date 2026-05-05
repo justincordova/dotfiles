@@ -1,13 +1,23 @@
 -- [[ Colorschemes ]]
 return {
-  -- Catppuccin (default theme)
+  -- Jellybeans (default theme)
+  {
+    'wtfox/jellybeans.nvim',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme 'jellybeans'
+    end,
+  },
+
+  -- Catppuccin
   {
     'catppuccin/nvim',
     name = 'catppuccin',
-    lazy = false,
+    lazy = true,
     priority = 1000,
     opts = {
-      flavour = 'mocha', -- latte, frappe, macchiato, mocha
+      flavour = 'mocha',
       transparent_background = false,
       integrations = {
         cmp = true,
@@ -32,7 +42,6 @@ return {
     },
     config = function(_, opts)
       require('catppuccin').setup(opts)
-      vim.cmd.colorscheme 'catppuccin-mocha'
     end,
   },
 
