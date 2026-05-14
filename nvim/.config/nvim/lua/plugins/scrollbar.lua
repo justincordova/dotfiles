@@ -2,9 +2,6 @@
 return {
   'petertriho/nvim-scrollbar',
   event = 'VeryLazy',
-  dependencies = {
-    'lewis6991/gitsigns.nvim',
-  },
   opts = {
     show = true,
     handle = {

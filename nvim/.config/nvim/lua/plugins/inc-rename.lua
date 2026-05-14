@@ -3,21 +3,12 @@
 return {
   'smjonas/inc-rename.nvim',
   cmd = 'IncRename',
-  config = function()
-    require('inc_rename').setup {
-      -- Command name
-      cmd_name = 'IncRename',
-      -- Highlight group for the current word
-      hl_group = 'Substitute',
-      -- Preview empty names
-      preview_empty_name = false,
-      -- Show message after rename
-      show_message = true,
-      -- Input buffer type
-      input_buffer_type = nil,
-      -- Post hook for additional actions after rename
-      post_hook = nil,
-    }
-  end,
-
+  opts = {
+    cmd_name = 'IncRename',
+    hl_group = 'Substitute',
+    preview_empty_name = false,
+    show_message = true,
+    input_buffer_type = nil,
+    post_hook = nil,
+  },
 }
