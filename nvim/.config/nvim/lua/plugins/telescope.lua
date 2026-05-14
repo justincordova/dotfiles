@@ -2,7 +2,7 @@
 return {
   {
     'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
+    cmd = 'Telescope',
     branch = 'master',
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -20,10 +20,39 @@ return {
       { 'jvgrootveld/telescope-zoxide' },
       { 'rcarriga/nvim-notify' }, -- For notification history
     },
+    keys = {
+      { '<leader><space>', function() require('telescope.builtin').find_files() end, desc = 'Find Files' },
+      { '<leader>ff', function() require('telescope.builtin').find_files() end, desc = 'Find Files' },
+      { '<leader>fg', function() require('telescope.builtin').live_grep() end, desc = 'Live Grep' },
+      { '<leader>fb', function() require('telescope.builtin').buffers() end, desc = 'Find Buffers' },
+      { '<leader>fr', function() require('telescope.builtin').oldfiles() end, desc = 'Recent Files' },
+      { '<leader>fh', function() require('telescope.builtin').help_tags() end, desc = 'Help Tags' },
+      { '<leader>fk', function() require('telescope.builtin').keymaps() end, desc = 'Find Keymaps' },
+      { '<leader>fc', function() require('config.utils').find_config_files() end, desc = 'Config Files' },
+      { '<leader>fp', function() require('telescope').extensions.project.project() end, desc = 'Projects' },
+      { '<leader>fz', function() require('telescope').extensions.zoxide.list() end, desc = 'Z Directories' },
+      { '<leader>sw', function() require('telescope.builtin').grep_string() end, desc = 'Search word under cursor' },
+      {
+        '<leader>ut',
+        function()
+          require('telescope.builtin').colorscheme {
+            enable_preview = true,
+            attach_mappings = function(_, map)
+              map('i', '<CR>', function(prompt_bufnr)
+                local selection = require('telescope.actions.state').get_selected_entry()
+                require('telescope.actions').close(prompt_bufnr)
+                vim.cmd.colorscheme(selection.value)
+              end)
+              return true
+            end,
+          }
+        end,
+        desc = 'Toggle theme',
+      },
+    },
     config = function()
       local telescope = require 'telescope'
       local actions = require 'telescope.actions'
-      local builtin = require 'telescope.builtin'
 
       telescope.setup {
         defaults = {
@@ -70,35 +99,6 @@ return {
       pcall(telescope.load_extension, 'project')
       pcall(telescope.load_extension, 'zoxide')
       pcall(telescope.load_extension, 'notify')
-
-      -- Telescope keybindings (Leader f - Find)
-      vim.keymap.set('n', '<leader><space>', builtin.find_files, { desc = 'Find Files' })
-      vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find Files' })
-      vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Live Grep' })
-      vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find Buffers' })
-      vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = 'Recent Files' })
-      vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help Tags' })
-      vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = 'Find Keymaps' })
-      vim.keymap.set('n', '<leader>fc', require('config.utils').find_config_files, { desc = 'Config Files' })
-      vim.keymap.set('n', '<leader>fp', telescope.extensions.project.project, { desc = 'Projects' })
-      vim.keymap.set('n', '<leader>fz', telescope.extensions.zoxide.list, { desc = 'Z Directories' })
-      -- Colorscheme switcher with preview
-      vim.keymap.set('n', '<leader>ut', function()
-        builtin.colorscheme {
-          enable_preview = true,
-          attach_mappings = function(_, map)
-            map('i', '<CR>', function(prompt_bufnr)
-              local selection = require('telescope.actions.state').get_selected_entry()
-              require('telescope.actions').close(prompt_bufnr)
-              vim.cmd.colorscheme(selection.value)
-            end)
-            return true
-          end,
-        }
-      end, { desc = 'Toggle theme' })
-
-      -- Search word under cursor
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = 'Search word under cursor' })
     end,
   },
 }
