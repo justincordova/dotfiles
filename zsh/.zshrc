@@ -2,25 +2,33 @@ export ZSH="$HOME/.oh-my-zsh"
 export BAT_THEME="Twork"
 export BUN_INSTALL="$HOME/.bun"
 export NVM_DIR="$HOME/.nvm"
-export PATH="/Users/justincordova/.antigravity/antigravity/bin:$BUN_INSTALL/bin:/opt/homebrew/bin:$PATH"
-# Add Go binaries to PATH
-export PATH="$PATH:$(go env GOPATH)/bin"
+export GOPATH="$HOME/go"
+
+# --- PATH (set once, before plugins) ---
+typeset -U path PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+path=(
+  "$HOME/.antigravity/antigravity/bin"
+  "$BUN_INSTALL/bin"
+  "$HOME/.local/bin"
+  "$HOME/.fly/bin"
+  "$GOPATH/bin"
+  $path
+)
+export PATH
 
 # --- Zsh Config ---
 ZSH_THEME=""
-ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="false"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search z)
 source $ZSH/oh-my-zsh.sh
-unsetopt correct
-unsetopt correctall
-
 
 # --- History & Completion ---
 HISTSIZE=10000; SAVEHIST=10000; HISTFILE=~/.zsh_history
 setopt inc_append_history share_history hist_ignore_dups hist_ignore_space hist_verify
-autoload -U compinit; compinit
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
+
 # --- Tools Initialization ---
 eval "$(starship init zsh)"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -78,17 +86,11 @@ idlem() {
   echo "1) Asciiquarium\n2) Pipes\n3) Cbonsai\n4) TTY Clock\n> "
   read -k 1 opt; echo ""
   case $opt in
-    1) asciiquarium ;; 2) pipe.sh ;; 3) cbonsai ;; 4) tty-clock -s -c -C 5 -t ;; *) echo "Invalid option." ;; 
+    1) asciiquarium ;; 2) pipe.sh ;; 3) cbonsai ;; 4) tty-clock -s -c -C 5 -t ;; *) echo "Invalid option." ;;
   esac
 }
 
 # --- Auto-start ---
 if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
-  tmux attach -t main || tmux new -s main
+  exec tmux new-session -A -s main
 fi
-export PATH="$HOME/.local/bin:$PATH"
-export TERM=xterm-256color
-
-# bun completions
-[ -s "/Users/justincordova/.bun/_bun" ] && source "/Users/justincordova/.bun/_bun"
-export PATH="$HOME/.fly/bin:$PATH"
