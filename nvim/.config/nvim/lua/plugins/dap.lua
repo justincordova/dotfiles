@@ -34,7 +34,7 @@ return {
       -- Auto-install debug adapters via Mason
       {
         'jay-babu/mason-nvim-dap.nvim',
-        dependencies = { 'williamboman/mason.nvim' },
+        dependencies = { 'mason-org/mason.nvim' },
         opts = {
           ensure_installed = {
             'python',

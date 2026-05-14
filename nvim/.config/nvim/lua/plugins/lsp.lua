@@ -5,9 +5,15 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
-      -- Mason for managing LSP servers
-      { 'williamboman/mason.nvim', cmd = 'Mason', build = ':MasonUpdate', config = true },
-      { 'williamboman/mason-lspconfig.nvim' },
+      -- Mason for managing LSP servers (setup happens in config below)
+      { 'mason-org/mason.nvim', cmd = 'Mason', build = ':MasonUpdate' },
+      { 'mason-org/mason-lspconfig.nvim' },
+
+      -- Completion capabilities (must load before vim.lsp.config('*', {capabilities}))
+      'saghen/blink.cmp',
+
+      -- Telescope (used by LspAttach mappings below)
+      'nvim-telescope/telescope.nvim',
 
       -- Useful status updates for LSP
       { 'j-hui/fidget.nvim', opts = {} },
