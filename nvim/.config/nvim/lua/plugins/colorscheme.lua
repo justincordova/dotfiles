@@ -15,7 +15,6 @@ return {
     'catppuccin/nvim',
     name = 'catppuccin',
     lazy = true,
-    priority = 1000,
     opts = {
       flavour = 'mocha',
       transparent_background = false,
@@ -49,7 +48,6 @@ return {
   {
     'projekt0n/github-nvim-theme',
     lazy = true,
-    priority = 999,
     config = function()
       require('github-theme').setup {
         options = {
@@ -70,8 +68,7 @@ return {
   {
     'rose-pine/neovim',
     name = 'rose-pine',
-    lazy = false,
-    priority = 999,
+    lazy = true,
     opts = {
       variant = 'auto',
       dark_variant = 'main',
@@ -118,8 +115,7 @@ return {
   -- Kanso
   {
     'webhooked/kanso.nvim',
-    lazy = false,
-    priority = 999,
+    lazy = true,
     opts = {
       bold = true,
       italics = true,
