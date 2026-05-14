@@ -1,7 +1,6 @@
 -- [[ Session Management ]]
 return {
   'folke/persistence.nvim',
-  event = 'BufReadPre',
   opts = {
     options = { 'buffers', 'curdir', 'tabpages', 'winsize' },
     pre_save = function()

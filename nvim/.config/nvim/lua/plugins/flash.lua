@@ -2,7 +2,6 @@
 -- Jump anywhere on screen with 2 keystrokes
 return {
   'folke/flash.nvim',
-  event = 'VeryLazy',
   opts = {
     -- Labels to use for jump targets
     labels = 'asdfghjklqwertyuiopzxcvbnm',

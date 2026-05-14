@@ -5,7 +5,7 @@ return {
     { 'nvim-tree/nvim-web-devicons', optional = true },
   },
   init = function() vim.g.barbar_auto_setup = false end,
-  event = 'VeryLazy',
+  event = { 'BufReadPre', 'BufNewFile' },
   opts = {
     animation = true,
     clickable = true,

@@ -77,8 +77,10 @@ return {
       vim.api.nvim_win_set_config(win, { zindex = 100 })
     end,
   },
-  init = function()
+  config = function(_, opts)
+    local notify = require 'notify'
+    notify.setup(opts)
     -- Set nvim-notify as the default notify handler
-    vim.notify = require 'notify'
+    vim.notify = notify
   end,
 }
