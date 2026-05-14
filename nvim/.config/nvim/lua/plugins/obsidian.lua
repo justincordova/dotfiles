@@ -49,13 +49,6 @@ return {
       end
       return tostring(os.time()) .. '-' .. suffix
     end,
-    -- Templates configuration (disabled - folder doesn't exist)
-    -- Create the folder in your vault if you want to use templates
-    -- templates = {
-    --   subdir = 'templates',
-    --   date_format = '%Y-%m-%d',
-    --   time_format = '%H:%M',
-    -- },
     follow_url_func = function(url)
       vim.fn.jobstart { 'open', url }
     end,
