@@ -91,3 +91,4 @@ export TERM=xterm-256color
 
 # bun completions
 [ -s "/Users/justincordova/.bun/_bun" ] && source "/Users/justincordova/.bun/_bun"
+export PATH="$HOME/.fly/bin:$PATH"
