@@ -94,3 +94,6 @@ idlem() {
 if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
   exec tmux new-session -A -s main
 fi
+
+# bun completions
+[ -s "/Users/justincordova/.bun/_bun" ] && source "/Users/justincordova/.bun/_bun"
