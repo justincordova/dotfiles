@@ -147,8 +147,14 @@ function M.setup()
         return
       end
 
-      local name = vim.fn.fnamemodify(args[1], ":t")
-      if name == "scratch" or name == "SCRATCH" then
+      -- Only treat a bare "scratch"/"SCRATCH" argument as the scratch sentinel.
+      -- If the argument resolves to a real existing file or directory, leave it
+      -- alone so a legitimately named file is not hijacked.
+      local arg = args[1]
+      local name = vim.fn.fnamemodify(arg, ":t")
+      local is_sentinel = (name == "scratch" or name == "SCRATCH")
+      local exists = vim.fn.filereadable(arg) == 1 or vim.fn.isdirectory(arg) == 1
+      if is_sentinel and not exists then
         local start_buf = vim.api.nvim_get_current_buf()
         vim.bo[start_buf].buflisted = false
         vim.bo[start_buf].bufhidden = "hide"
