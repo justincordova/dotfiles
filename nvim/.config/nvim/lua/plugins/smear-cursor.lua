@@ -35,8 +35,15 @@ return {
           scroll_timer = nil
         end
 
-        scroll_timer = vim.uv.new_timer()
-        scroll_timer:start(100, 0, function()
+        local timer = vim.uv.new_timer()
+        scroll_timer = timer
+        timer:start(100, 0, function()
+          -- One-shot timer: close the handle once it fires so it is not leaked.
+          timer:stop()
+          timer:close()
+          if scroll_timer == timer then
+            scroll_timer = nil
+          end
           vim.schedule(function()
             scroll_count = 0
             if not smear.enabled then
