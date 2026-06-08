@@ -127,22 +127,25 @@ vim.keymap.set("n", "<leader>h", function()
     return
   end
 
-  -- Create new checkhealth buffer
-  -- Save current window to return to it
+  -- Create new checkhealth buffer.
+  -- :checkhealth opens in the current window by default, but may open a new
+  -- tab on some setups. Track tabs so we only close a tab we actually created.
   local current_win = vim.api.nvim_get_current_win()
+  local tabs_before = #vim.api.nvim_list_tabpages()
 
-  -- Run checkhealth (opens in new tab)
   vim.cmd("checkhealth")
 
   -- Get the checkhealth buffer that was just created
   health_buf = vim.api.nvim_get_current_buf()
 
-  -- Close the tab that checkhealth created
-  vim.cmd("tabclose")
-
-  -- Go back to original window and show checkhealth buffer there
-  vim.api.nvim_set_current_win(current_win)
-  vim.api.nvim_set_current_buf(health_buf)
+  -- If checkhealth opened a new tab, close it and return to the original window.
+  if #vim.api.nvim_list_tabpages() > tabs_before then
+    vim.cmd("tabclose")
+    if vim.api.nvim_win_is_valid(current_win) then
+      vim.api.nvim_set_current_win(current_win)
+    end
+    vim.api.nvim_set_current_buf(health_buf)
+  end
 
   -- Configure buffer options
   vim.bo[health_buf].buflisted = false
