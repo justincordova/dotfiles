@@ -45,7 +45,15 @@ return {
               vim.bo[buf].bufhidden = 'wipe'
               vim.bo[buf].filetype = 'markdown'
 
-              local lines = vim.split(selection.value.message, '\n')
+              -- nvim-notify stores message as a list of lines; older/other
+              -- producers may use a plain string. Handle both.
+              local message = selection.value.message
+              local lines
+              if type(message) == 'table' then
+                lines = message
+              else
+                lines = vim.split(message, '\n')
+              end
               vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
               vim.cmd('split')
