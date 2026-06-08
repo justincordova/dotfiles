@@ -63,27 +63,30 @@ function M.export()
     return
   end
 
-  local lines = nil
-  local scratch_bufnr = find_scratch_buffer()
-  if scratch_bufnr then
-    vim.api.nvim_buf_call(scratch_bufnr, function()
-      if vim.bo.modified then
-        vim.cmd "silent write"
-      end
-    end)
-    lines = vim.api.nvim_buf_get_lines(scratch_bufnr, 0, -1, false)
-  else
-    if vim.fn.filereadable(scratch_path) == 1 then
-      lines = vim.fn.readfile(scratch_path)
-    else
-      lines = {}
-    end
-  end
-
-  local date_prefix = os.date "%Y-%m-%d"
-
   vim.ui.input({ prompt = "Scratch title: " }, function(input)
     if input == nil then return end -- user cancelled
+
+    -- Capture content here (after the async prompt resolves) so edits made to
+    -- the scratch buffer while the prompt was open are not lost.
+    local lines
+    local scratch_bufnr = find_scratch_buffer()
+    if scratch_bufnr then
+      vim.api.nvim_buf_call(scratch_bufnr, function()
+        if vim.bo.modified then
+          vim.cmd "silent write"
+        end
+      end)
+      lines = vim.api.nvim_buf_get_lines(scratch_bufnr, 0, -1, false)
+    else
+      if vim.fn.filereadable(scratch_path) == 1 then
+        lines = vim.fn.readfile(scratch_path)
+      else
+        lines = {}
+      end
+    end
+
+    local date_prefix = os.date "%Y-%m-%d"
+
     local slug = slugify_title(input)
     if slug == "" then
       slug = "scratch"
