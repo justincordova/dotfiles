@@ -56,8 +56,7 @@ return {
       end
       local has_neo_tree = false
       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local name = vim.api.nvim_buf_get_name(buf)
-        if name:match("neo%-tree") then
+        if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype == 'neo-tree' then
           has_neo_tree = true
           break
         end
