@@ -10,7 +10,8 @@ esac
 # 🚀 Oh My Bash Setup
 ############################################
 export OSH="$HOME/.oh-my-bash"
-OSH_THEME="ht"
+# Prompt is handled by Starship (see end of file); no OMB theme.
+OSH_THEME=""
 
 # Optional: Use custom folder for OMB (uncomment if needed)
 # OSH_CUSTOM=/path/to/new-custom-folder
@@ -37,6 +38,11 @@ plugins=(git bashmarks)
 
 # Load Oh My Bash
 source "$OSH/oh-my-bash.sh"
+
+############################################
+# 🚀 Prompt (Starship)
+############################################
+command -v starship &>/dev/null && eval "$(starship init bash)"
 
 ############################################
 # 🔁 Aliases
