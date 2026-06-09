@@ -1,13 +1,11 @@
-[user]
-	name = Justin Cordova
-	email = justinavodroc@gmail.com
+# Machine-specific identity (name, email, tool IDs) lives here, untracked.
+[include]
+	path = ~/.gitconfig.local
 
 # Use your preferred text editor for commit messages (e.g., nano, vim, code)
 [core]
 	editor = code --wait
-
-# Set line ending handling (important on Windows)
-# For macOS/Linux, usually:
+	# Line ending handling (input = checkout as-is, commit LF)
 	autocrlf = input
 
 # Enable colored output for Git commands
@@ -42,7 +40,5 @@
 	required = true
 [cola]
 	startupmode = folder
-[coderabbit]
-	machineId = cli/d8ee683134814c33b20af5bcb9ad932d
 [init]
 	defaultBranch = main
