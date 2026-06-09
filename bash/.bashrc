@@ -47,7 +47,8 @@ command -v starship &>/dev/null && eval "$(starship init bash)"
 ############################################
 # 🔁 Aliases
 ############################################
-alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/"
+# Shared aliases (bash + zsh)
+[ -f "$HOME/.shell_aliases" ] && source "$HOME/.shell_aliases"
 
 ############################################
 # 🌍 Environment Variables

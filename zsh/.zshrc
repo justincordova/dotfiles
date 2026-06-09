@@ -47,8 +47,10 @@ alias ll='eza -la'
 alias l='eza -l'
 alias lt='eza --tree'
 
+# Shared aliases (bash + zsh)
+[ -f "$HOME/.shell_aliases" ] && source "$HOME/.shell_aliases"
+
 # Navigation
-alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/"
 alias v="nvim"
 alias obi="cd /Users/justincordova/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/obi"
 alias codep='code .. --reuse-window'
