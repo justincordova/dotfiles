@@ -92,9 +92,9 @@ $WingetPackages = @(
   'junegunn.fzf'
   'ajeetdsouza.zoxide'
   'jqlang.jq'
-  'atuinsh.atuin'
+  'Atuinsh.Atuin'
   'Casey.Just'
-  'XAMPPRocky.tokei'
+  'XAMPPRocky.Tokei'
   'Fastfetch-cli.Fastfetch'
   '7zip.7zip'
 
