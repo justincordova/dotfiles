@@ -184,8 +184,10 @@ if phase tools; then
     url=$(gh_asset dandavison/delta "${A_DELTA}.tar.gz") || true
     if [ -n "${url:-}" ]; then
       tmp=$(mktemp -d)
-      if run bash -c "curl -fsSL '$url' | tar -xz -C '$tmp' --strip-components=1" \
-         && [ -f "$tmp/delta" ]; then
+      run bash -c "curl -fsSL '$url' | tar -xz -C '$tmp' --strip-components=1"
+      if [ -n "${DRY_RUN:-}" ]; then
+        c_info "DRY: install delta -> $LOCAL_BIN/delta"
+      elif [ -f "$tmp/delta" ]; then
         run install -m 755 "$tmp/delta" "$LOCAL_BIN/delta"
         c_good 'delta'
       else
@@ -344,7 +346,10 @@ if phase link; then
 
   # Machine-local git identity, mirroring macOS.
   if [ ! -f "$HOME/.gitconfig.local" ]; then
-    cat > "$HOME/.gitconfig.local" <<'EOF'
+    if [ -n "${DRY_RUN:-}" ]; then
+      c_info "DRY: write $HOME/.gitconfig.local"
+    else
+      cat > "$HOME/.gitconfig.local" <<'EOF'
 [user]
 	name = Justin Cordova
 	email = CHANGE_ME
@@ -353,11 +358,14 @@ if phase link; then
 [credential]
 	helper = cache --timeout=3600
 EOF
-    c_warn "created ~/.gitconfig.local -- set your email"
+      c_warn "created $HOME/.gitconfig.local -- set your email"
+    fi
   fi
 
-  if [ "$SHELL" != "$(command -v zsh)" ]; then
-    c_warn "default shell is $SHELL; switch with: chsh -s $(command -v zsh)"
+  # command -v is empty until the packages phase has actually installed zsh.
+  zsh_path=$(command -v zsh || echo /usr/bin/zsh)
+  if [ "$SHELL" != "$zsh_path" ]; then
+    c_warn "default shell is $SHELL; switch with: chsh -s $zsh_path"
   fi
 fi
 
@@ -377,8 +385,11 @@ if phase agents; then
     fi
   done
 
-  mkdir -p "$HOME/.opencode"
   if [ ! -f "$HOME/.opencode/opencode.json" ]; then
+    if [ -n "${DRY_RUN:-}" ]; then
+      c_info "DRY: write $HOME/.opencode/opencode.json"
+    else
+    mkdir -p "$HOME/.opencode"
     cat > "$HOME/.opencode/opencode.json" <<'EOF'
 {
   "$schema": "https://opencode.ai/config.json",
@@ -399,7 +410,8 @@ if phase agents; then
   }
 }
 EOF
-    c_good "wrote $HOME/.opencode/opencode.json"
+      c_good "wrote $HOME/.opencode/opencode.json"
+    fi
   fi
 
   have rtk && c_warn 'run: rtk init -g'
