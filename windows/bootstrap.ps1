@@ -123,15 +123,21 @@ if (Phase 'packages') {
     if ($installed -match [regex]::Escape($id)) { Info "$id (already installed)"; continue }
     if (-not $PSCmdlet.ShouldProcess($id, 'winget install')) { continue }
 
-    Write-Host "  installing $id ..." -NoNewline
-    $null = winget install --id $id --exact --silent `
+    # Stream winget's own output. Capturing it makes a slow installer (Python,
+    # LLVM) indistinguishable from a hang, and hides any prompt it is blocked on.
+    Write-Host "  installing $id ..." -ForegroundColor DarkGray
+    winget install --id $id --exact --silent `
       --accept-package-agreements --accept-source-agreements `
-      --disable-interactivity 2>&1
-    if ($LASTEXITCODE -eq 0) {
-      Write-Host ' ok' -ForegroundColor Green
-    } else {
-      Write-Host " FAILED (exit $LASTEXITCODE)" -ForegroundColor Red
-      $Failed.Add("winget: $id")
+      --disable-interactivity
+
+    switch ($LASTEXITCODE) {
+      0            { Good "$id ok" }
+      -1978335189  { Info "$id (already current)" }   # 0x8A15002B no applicable upgrade
+      -1978335135  { Info "$id (already installed)" } # 0x8A150061 already installed
+      default {
+        Write-Host "  $id FAILED (exit $LASTEXITCODE)" -ForegroundColor Red
+        $Failed.Add("winget: $id")
+      }
     }
   }
   Warn 'Restart your shell before the next phase so PATH updates apply.'
