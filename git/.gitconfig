@@ -1,12 +1,12 @@
-# Machine-specific identity (name, email, tool IDs) lives here, untracked.
+# Machine-specific settings (identity, credential helper, line endings, tool IDs)
+# live here, untracked. Anything platform-dependent belongs in that file, not
+# this one — values set below would override it.
 [include]
 	path = ~/.gitconfig.local
 
 # Use your preferred text editor for commit messages (e.g., nano, vim, code)
 [core]
 	editor = code --wait
-	# Line ending handling (input = checkout as-is, commit LF)
-	autocrlf = input
 
 # Enable colored output for Git commands
 [color]
@@ -29,10 +29,6 @@
 	df = diff
 	lg = log --oneline --graph --decorate --all
 
-# Credential helper to cache or store passwords securely
-[credential]
-	helper = osxkeychain   # macOS
-	# For Linux, you might use: helper = cache --timeout=3600
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
