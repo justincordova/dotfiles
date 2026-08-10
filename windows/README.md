@@ -63,6 +63,13 @@ Phases are independent and re-runnable:
 .\bootstrap.ps1 -Only nvim       # lazy.nvim sync
 ```
 
+`-Skip` excludes winget IDs. Packages install in list order, so a single hanging
+installer otherwise blocks everything after it:
+
+```powershell
+.\bootstrap.ps1 -Only packages -Skip Python.Python.3.13
+```
+
 ## Manual steps afterward
 
 These can't be scripted.

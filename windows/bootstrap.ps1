@@ -17,6 +17,9 @@ param(
   [ValidateSet('packages', 'node', 'agents', 'link', 'nvim')]
   [string[]]$Only,
 
+  # winget IDs to leave alone, e.g. -Skip Python.Python.3.13
+  [string[]]$Skip,
+
   [string]$DotfilesRepo = 'git@github.com:justincordova/dotfiles.git',
   [string]$AgentRepo    = 'git@github.com:justincordova/agents.git'
 )
@@ -120,6 +123,7 @@ if (Phase 'packages') {
   $installed = (winget list --disable-interactivity 2>$null | Out-String)
 
   foreach ($id in $WingetPackages) {
+    if ($script:Skip -and $script:Skip -contains $id) { Warn "$id (skipped by -Skip)"; continue }
     if ($installed -match [regex]::Escape($id)) { Info "$id (already installed)"; continue }
     if (-not $PSCmdlet.ShouldProcess($id, 'winget install')) { continue }
 
