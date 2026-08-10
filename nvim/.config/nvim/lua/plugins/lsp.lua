@@ -5,8 +5,11 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
-      -- Mason for managing LSP servers (setup happens in config below)
-      { 'mason-org/mason.nvim', cmd = 'Mason', build = ':MasonUpdate' },
+      -- Mason for managing LSP servers (setup happens in config below).
+      -- No `build = ':MasonUpdate'`: mason v2 refreshes its registry on demand,
+      -- and because this spec is lazy-loaded the build step ran before mason had
+      -- registered any commands, failing with E492 on a clean install.
+      { 'mason-org/mason.nvim', cmd = 'Mason' },
       { 'mason-org/mason-lspconfig.nvim' },
 
       -- Completion capabilities (must load before vim.lsp.config('*', {capabilities}))
