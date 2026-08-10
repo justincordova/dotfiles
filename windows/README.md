@@ -23,10 +23,19 @@ Native Windows + PowerShell 7. No WSL, no Stow.
 
 1. **Developer Mode on** — Settings > System > For developers > Developer Mode.
    Required for symlinks without elevation. `bootstrap.ps1` refuses to link without it.
-2. **PowerShell 7** — `winget install Microsoft.PowerShell`. Run everything from `pwsh`,
-   not the built-in Windows PowerShell 5.1.
-3. **An SSH key on GitHub** — the repos are cloned over SSH.
-   `ssh-keygen -t ed25519 -C "you@example.com"; gh auth login`
+2. **Bootstrap the bootstrapper.** The script clones over SSH, so git, pwsh, and gh
+   have to exist before it runs. From the stock Windows PowerShell:
+
+   ```powershell
+   winget install Git.Git Microsoft.PowerShell GitHub.cli
+   ```
+
+   Then close it and open **pwsh** for everything below — not Windows PowerShell 5.1.
+3. **Auth to GitHub**, which also generates and uploads an SSH key:
+
+   ```powershell
+   gh auth login          # choose SSH, let it create the key
+   ```
 
 ## Run
 
@@ -37,6 +46,9 @@ cd $HOME\dotfiles\windows
 .\bootstrap.ps1 -WhatIf     # dry run first
 .\bootstrap.ps1
 ```
+
+The three packages above are in the winget list too, so re-installing them is a
+no-op — the script skips anything already present.
 
 Restart the terminal between phases where noted — winget changes `PATH` and the
 current session won't see it.
