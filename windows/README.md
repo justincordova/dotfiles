@@ -72,12 +72,15 @@ installer otherwise blocks everything after it:
 
 ## Manual steps afterward
 
-These can't be scripted.
+These can't be scripted. **Run them in this order** — each depends on the last.
 
-1. `rtk init -g` — installs the native binary hook. This replaces the macOS
+1. `.\bootstrap.ps1 -Only link` then `-Only agents`, if you haven't. The agents
+   phase is what creates `~\.claude\` and populates it from the `agent` repo.
+2. `rtk init -g` — installs the native binary hook. This replaces the macOS
    `~/.claude/hooks/rtk-rewrite.sh`; do **not** copy that script over.
-2. `gh auth login`
-3. `claude` -> `/login`, then install plugins:
+   It writes into `~\.claude\` and fails with `os error 3` if step 1 was skipped.
+3. `gh auth login`
+4. `claude` -> `/login`, then install plugins:
    ```
    /plugin marketplace add jarrodwatts/claude-hud
    /plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
@@ -93,15 +96,15 @@ These can't be scripted.
    /plugin install claude-md-management@claude-plugins-official
    /plugin install ui-ux-pro-max@ui-ux-pro-max-skill
    ```
-4. `Update-ClaudeHud` — pins the statusline to a direct `bun.exe` path.
+5. `Update-ClaudeHud` — pins the statusline to a direct `bun.exe` path.
    The setup command generates a `powershell -Command` wrapper that spawns a
    visible console window on every ~300ms refresh
    ([claude-hud#121](https://github.com/jarrodwatts/claude-hud/issues/121)).
    Re-run this after any claude-hud update.
-5. `opencode` -> `/connect`
-6. Set the terminal font to **JetBrainsMono Nerd Font**, or the Starship prompt
+6. `opencode` -> `/connect`
+7. Set the terminal font to **JetBrainsMono Nerd Font**, or the Starship prompt
    and Neovim devicons render as tofu.
-7. Fill in `~/.gitconfig.local`.
+8. Fill in `~/.gitconfig.local`.
 
 ## Secrets
 
