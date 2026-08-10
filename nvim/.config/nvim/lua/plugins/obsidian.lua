@@ -4,6 +4,10 @@ return {
   version = '*',
   lazy = true,
   ft = 'markdown',
+  -- The vault lives in macOS iCloud Drive; skip this plugin elsewhere.
+  cond = function()
+    return vim.fn.has 'mac' == 1
+  end,
   dependencies = {
     'nvim-lua/plenary.nvim',
   },
@@ -12,7 +16,7 @@ return {
     workspaces = {
       {
         name = 'obi',
-        path = vim.fn.expand('~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obi'),
+        path = require('config.utils').obsidian_vault(),
       },
     },
     daily_notes = {

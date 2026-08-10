@@ -1,7 +1,7 @@
 local M = {}
 
 local scratch_path = vim.fn.expand "~/SCRATCH.md"
-local fleeting_dir = vim.fn.expand "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obi/50 Fleeting"
+local fleeting_dir = require("config.utils").obsidian_vault() .. "/50 Fleeting"
 
 local function ensure_scratch_file()
   if vim.fn.filereadable(scratch_path) == 0 then
