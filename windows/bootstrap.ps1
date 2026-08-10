@@ -107,21 +107,11 @@ $WingetPackages = @(
   '7zip.7zip'
 
   # languages / toolchains
-  'GoLang.Go'
   'Python.Python.3.13'
   'CoreyButler.NVMforWindows'
   'Oven-sh.Bun'
   'LLVM.LLVM'                         # clang - treesitter needs a C compiler
   'Kitware.CMake'
-  'zig.zig'
-
-  # media / docs
-  'Gyan.FFmpeg'
-  'ImageMagick.ImageMagick'
-  'JohnMacFarlane.Pandoc'
-
-  # local models
-  'Ollama.Ollama'
 )
 
 if (Phase 'packages') {

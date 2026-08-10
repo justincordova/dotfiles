@@ -115,8 +115,12 @@ with `{env:VAR}` placeholders that OpenCode resolves at runtime. Set them once:
 - **tmux** — no native build. The `zsh` auto-start block and `tmux/` package are
   skipped entirely. Use WezTerm panes or Windows Terminal tabs.
 - **`vim-tmux-navigator`** — installs but the pane-navigation half is inert.
-- **Treesitter** — needs a C compiler. `bootstrap.ps1` installs LLVM and zig; if
-  `:TSUpdate` fails, `:checkhealth nvim-treesitter`.
+- **Treesitter** — needs a C compiler. `bootstrap.ps1` installs LLVM (clang) for
+  this; if `:TSUpdate` fails, run `:checkhealth nvim-treesitter`.
+- **Go, zig, Ollama, FFmpeg, ImageMagick, Pandoc** — installed on macOS,
+  deliberately skipped here. `$env:GOPATH` is still set in `profile.ps1` to keep
+  parity with `.zshrc`; it points at a directory that won't exist, which is
+  harmless. Add the packages back to `$WingetPackages` if that changes.
 - **`telescope-fzf-native`** — its `build = 'make'` is guarded by
   `vim.fn.executable 'make'`, so it silently drops. Telescope falls back to the
   Lua sorter. Install `make` via winget (`GnuWin32.Make`) if you want the native one.
