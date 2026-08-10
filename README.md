@@ -1,10 +1,12 @@
 # dotfiles
 
-Personal dotfiles for macOS and Windows.
+Personal dotfiles for macOS, Windows, and Linux.
 
 - **macOS** — [GNU Stow](https://www.gnu.org/software/stow/) symlinks each package into `$HOME`.
 - **Windows** — [`windows/bootstrap.ps1`](windows/README.md) provisions the machine and
   symlinks the shared configs (`nvim/`, `starship/`, `git/`) into their Windows locations.
+- **Linux** — [`linux/bootstrap.sh`](linux/README.md) provisions an Ubuntu/Debian box
+  (apt + upstream installers) and stows the same packages macOS uses.
 
 `nvim/`, `starship/`, and `git/` are shared by both platforms. Anything
 platform-specific (credential helper, line endings, identity) lives in the
@@ -27,10 +29,11 @@ Stowing a package symlinks its contents into the right place.
 | `zsh/`      | `~/.zshrc`                   | Primary shell (Starship prompt)        |
 | `shell/`    | `~/.shell_aliases`           | Aliases shared by bash + zsh           |
 
-`scripts/` and `windows/` are **not** Stow packages. `scripts/` is invoked by
-absolute path at runtime; `windows/` is consumed by `bootstrap.ps1`. Do not run
-`stow */` — it selects every directory regardless of `.stow-local-ignore`, which
-only filters *within* a package. Name the packages explicitly.
+`scripts/`, `windows/`, and `linux/` are **not** Stow packages. `scripts/` is
+invoked by absolute path at runtime; the other two hold per-platform bootstrap
+scripts. Do not run `stow */` — it selects every directory regardless of
+`.stow-local-ignore`, which only filters *within* a package. Name the packages
+explicitly.
 
 ## Setup (macOS)
 
@@ -44,6 +47,15 @@ To remove a package's symlinks: `stow -D <package>`.
 
 API keys are **not** tracked. `~/.opencode/opencode.json` holds the MCP server
 secrets and stays untracked on every machine.
+
+## Setup (Linux)
+
+See [`linux/README.md`](linux/README.md).
+
+```sh
+git clone git@github.com:justincordova/dotfiles.git ~/dotfiles
+cd ~/dotfiles/linux && ./bootstrap.sh
+```
 
 ## Setup (Windows)
 
