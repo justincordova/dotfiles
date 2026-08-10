@@ -163,7 +163,6 @@ if phase tools; then
 
   have starship || { run sh -c 'curl -fsSL https://starship.rs/install.sh | sh -s -- -y'; c_good 'starship'; }
   have zoxide   || { run sh -c 'curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh'; c_good 'zoxide'; }
-  have atuin    || { run sh -c 'curl -fsSL https://setup.atuin.sh | sh'; c_good 'atuin'; }
 
   # lazygit (`lg`)
   if ! have lazygit; then

@@ -32,7 +32,7 @@ Phases are independent and re-runnable:
 
 ```sh
 ./bootstrap.sh packages    # apt, gh, eza
-./bootstrap.sh tools       # oh-my-zsh, starship, zoxide, atuin, lazygit, delta
+./bootstrap.sh tools       # oh-my-zsh, starship, zoxide, lazygit, delta
 ./bootstrap.sh node        # nvm + node, bun, opencode, claude, rtk
 ./bootstrap.sh docker      # docker-ce + compose plugin
 ./bootstrap.sh db          # psql, redis-cli, sqlcmd, supabase

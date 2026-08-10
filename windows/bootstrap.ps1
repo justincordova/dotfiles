@@ -103,7 +103,6 @@ $WingetPackages = @(
   'junegunn.fzf'
   'ajeetdsouza.zoxide'
   'jqlang.jq'
-  'Atuinsh.Atuin'
   'Casey.Just'
   'XAMPPRocky.Tokei'
   'Fastfetch-cli.Fastfetch'
