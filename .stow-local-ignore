@@ -1,4 +1,5 @@
 ^scripts$
+^windows$
 README.*
 \.git.*
 \.gitignore$
