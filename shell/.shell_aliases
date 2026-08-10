@@ -1,4 +1,7 @@
+# shellcheck shell=bash
 # Aliases shared between bash and zsh.
 # Sourced from ~/.bashrc and ~/.zshrc.
 
-alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/"
+case "$(uname -s)" in
+  Darwin) alias icloud="cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/" ;;
+esac

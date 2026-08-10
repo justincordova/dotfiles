@@ -6,7 +6,12 @@ export GOPATH="$HOME/go"
 
 # --- PATH (set once, before plugins) ---
 typeset -U path PATH
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew: /opt/homebrew on Apple Silicon, /home/linuxbrew on Linux. Absent on
+# plain Ubuntu, where apt handles packages -- so probe rather than assume.
+for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+  [[ -x "$_brew" ]] && eval "$("$_brew" shellenv)" && break
+done
+unset _brew
 path=(
   "$HOME/.antigravity/antigravity/bin"
   "$BUN_INSTALL/bin"
@@ -35,9 +40,12 @@ eval "$(starship init zsh)"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-# Conda
-__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then eval "$__conda_setup"; elif [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then . "/opt/anaconda3/etc/profile.d/conda.sh"; fi; unset __conda_setup
+# Conda (macOS install path; skipped where absent)
+if [ -x /opt/anaconda3/bin/conda ]; then
+  __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+  if [ $? -eq 0 ]; then eval "$__conda_setup"; elif [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then . "/opt/anaconda3/etc/profile.d/conda.sh"; fi
+  unset __conda_setup
+fi
 
 # --- Aliases ---
 alias c='clear'
@@ -52,7 +60,8 @@ alias lt='eza --tree'
 
 # Navigation
 alias v="nvim"
-alias obi="cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/obi"
+[[ "$OSTYPE" == darwin* ]] && \
+  alias obi="cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/obi"
 alias codep='code .. --reuse-window'
 alias cc='claude'
 alias oc='opencode'
@@ -82,7 +91,9 @@ alias ghd='gh dash'
 
 # --- Functions ---
 mkcd() { mkdir -p "$1" && cd "$1"; }
-cot() { if [ $# -eq 0 ]; then open -a CotEditor; else open -a CotEditor "$@"; fi }
+if [[ "$OSTYPE" == darwin* ]]; then
+  cot() { if [ $# -eq 0 ]; then open -a CotEditor; else open -a CotEditor "$@"; fi }
+fi
 
 idlem() {
   echo "1) Asciiquarium\n2) Pipes\n3) Cbonsai\n4) TTY Clock\n> "
@@ -93,6 +104,8 @@ idlem() {
 }
 
 # --- Auto-start ---
-if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
+# Ghostty locally; any SSH session too, so remote work survives a dropped link.
+if command -v tmux &>/dev/null && [ -z "$TMUX" ] && \
+   { [ "$TERM_PROGRAM" = "ghostty" ] || [ -n "$SSH_CONNECTION" ]; }; then
   exec tmux new-session -A -s main
 fi
