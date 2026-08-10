@@ -5,6 +5,14 @@ success_symbol = "➜ "
 error_symbol = "✗ "
 # keep it neutral so the folder/git colors stand out
 
+# Both force themselves visible when the shell is elevated (Administrator on
+# Windows, root elsewhere), which is the only time they'd ever appear.
+[username]
+disabled = true
+
+[hostname]
+disabled = true
+
 [directory]
 truncation_length = 1
 truncate_to_repo = false
