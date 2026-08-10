@@ -49,8 +49,16 @@ if (-not (Have winget)) {
 Good "winget $(winget --version)"
 
 # Symlinks need either Developer Mode or an elevated shell.
-$devMode = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' `
-  -Name AllowDevelopmentWithoutDevLicense -ErrorAction SilentlyContinue).AllowDevelopmentWithoutDevLicense
+# The AppModelUnlock key only exists once Developer Mode has been toggled at
+# least once, and Set-StrictMode turns a missing property into a hard error --
+# so probe for the property before reading it.
+function Get-DevModeFlag {
+  $key = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -ErrorAction SilentlyContinue
+  if (-not $key) { return 0 }
+  if ($key.PSObject.Properties.Name -notcontains 'AllowDevelopmentWithoutDevLicense') { return 0 }
+  return [int]$key.AllowDevelopmentWithoutDevLicense
+}
+$devMode = Get-DevModeFlag
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
   ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 

@@ -131,10 +131,13 @@ function Update-ClaudeHud {
 
   # Direct bun.exe invocation - wrapping in `powershell -Command` spawns a
   # console window on every ~300ms statusline refresh.
-  $settings.statusLine = [pscustomobject]@{
+  # Add-Member -Force rather than direct assignment: ConvertFrom-Json returns a
+  # PSCustomObject, and assigning a property it doesn't already have throws.
+  $settings | Add-Member -NotePropertyName statusLine -NotePropertyValue ([pscustomobject]@{
     type    = 'command'
     command = "`"$bun`" --env-file NUL `"$entry`""
-  }
+  }) -Force
+
   $settings | ConvertTo-Json -Depth 20 | Set-Content $settingsPath -Encoding utf8
   Write-Host "statusLine -> $entry" -ForegroundColor Green
 }
