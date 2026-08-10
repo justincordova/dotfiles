@@ -1,5 +1,21 @@
 -- [[ Yanky - Yank History ]]
 -- Cycle through yank history with ring navigation
+
+-- sqlite storage persists history across sessions, but needs libsqlite3 -- which
+-- macOS and Linux ship and Windows does not. Fall back to in-memory there, which
+-- keeps ring navigation and the telescope picker working within a session.
+-- To opt back in on Windows, set vim.g.sqlite_clib_path to a sqlite3.dll.
+local function ring_storage()
+  if vim.fn.has 'win32' == 0 then
+    return 'sqlite'
+  end
+  local dll = vim.g.sqlite_clib_path
+  if dll and dll ~= '' and vim.fn.filereadable(dll) == 1 then
+    return 'sqlite'
+  end
+  return 'memory'
+end
+
 return {
   'gbprod/yanky.nvim',
   dependencies = { 'kkharji/sqlite.lua' },
@@ -8,7 +24,7 @@ return {
     -- Ring configuration
     ring = {
       history_length = 100,
-      storage = 'sqlite',
+      storage = ring_storage(),
       sync_with_numbered_registers = true,
       cancel_event = 'update',
       ignore_registers = { '_' },
