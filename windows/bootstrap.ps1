@@ -154,8 +154,9 @@ if (Phase 'node') {
 
   if (Have nvm) {
     if ($PSCmdlet.ShouldProcess('node lts', 'nvm install')) {
-      nvm install lts | Out-Null
-      nvm use lts     | Out-Null
+      Info 'nvm install lts ...'
+      nvm install lts
+      nvm use lts
       Good "node $(node --version 2>$null)"
     }
   } else {
@@ -163,12 +164,15 @@ if (Phase 'node') {
   }
 
   # OpenCode has no winget package; npm is the supported Windows path.
+  # Output is streamed, not captured: `npm install -g` can run for minutes and a
+  # silent terminal is indistinguishable from a hang.
   $npmGlobals = @('opencode-ai', 'agent-browser')
   foreach ($pkg in $npmGlobals) {
     if (-not (Have npm)) { Warn 'npm unavailable - skipping global installs'; break }
     if ($PSCmdlet.ShouldProcess($pkg, 'npm install -g')) {
-      npm install -g $pkg 2>&1 | Out-Null
-      if ($LASTEXITCODE -eq 0) { Good $pkg } else { $Failed.Add("npm: $pkg") }
+      Info "npm install -g $pkg ..."
+      npm install -g $pkg
+      if ($LASTEXITCODE -eq 0) { Good "$pkg ok" } else { $Failed.Add("npm: $pkg") }
     }
   }
 
