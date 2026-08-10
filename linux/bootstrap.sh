@@ -20,11 +20,14 @@ LOCAL_BIN="$HOME/.local/bin"
 FAILED=()
 PHASES=("$@")
 
-c_head() { printf '\n\033[1;36m%s\033[0m\n' "$*"; }
-c_good() { printf '  \033[0;32m%s\033[0m\n' "$*"; }
-c_warn() { printf '  \033[0;33m%s\033[0m\n' "$*"; }
-c_info() { printf '  \033[0;90m%s\033[0m\n' "$*"; }
-c_err()  { printf '  \033[0;31m%s\033[0m\n' "$*"; }
+# All logging goes to stderr. Several call sites look like
+#   curl ... | run sudo tee FILE >/dev/null
+# where the trailing redirect would otherwise swallow the log line too.
+c_head() { printf '\n\033[1;36m%s\033[0m\n' "$*" >&2; }
+c_good() { printf '  \033[0;32m%s\033[0m\n' "$*" >&2; }
+c_warn() { printf '  \033[0;33m%s\033[0m\n' "$*" >&2; }
+c_info() { printf '  \033[0;90m%s\033[0m\n' "$*" >&2; }
+c_err()  { printf '  \033[0;31m%s\033[0m\n' "$*" >&2; }
 
 phase() {
   [ ${#PHASES[@]} -eq 0 ] && return 0
@@ -36,7 +39,14 @@ phase() {
 have() { command -v "$1" >/dev/null 2>&1; }
 
 run() {
-  if [ -n "${DRY_RUN:-}" ]; then c_info "DRY: $*"; return 0; fi
+  if [ -n "${DRY_RUN:-}" ]; then
+    c_info "DRY: $*"
+    # Several call sites are `curl ... | run sudo tee ...`. Without executing the
+    # command nothing reads the pipe, so curl dies with "(23) Failure writing
+    # output to destination" and set -e aborts the run. Drain stdin when piped.
+    [ -t 0 ] || cat >/dev/null 2>&1 || true
+    return 0
+  fi
   "$@"
 }
 
@@ -95,12 +105,13 @@ if phase packages; then
   c_head "Packages (apt)"
   run sudo apt-get update -qq
   run sudo apt-get install -y "${APT_PACKAGES[@]}"
-  c_good "installed ${#APT_PACKAGES[@]} apt packages"
+  [ -z "${DRY_RUN:-}" ] && c_good "installed ${#APT_PACKAGES[@]} apt packages"
 
   # Debian renames these to avoid collisions; the dotfiles expect the real names.
-  [ -x /usr/bin/batcat ] && run ln -sf /usr/bin/batcat "$LOCAL_BIN/bat"
-  [ -x /usr/bin/fdfind ] && run ln -sf /usr/bin/fdfind "$LOCAL_BIN/fd"
-  c_info 'linked batcat->bat, fdfind->fd in ~/.local/bin'
+  [ -x /usr/bin/batcat ] && run ln -sf /usr/bin/batcat "$LOCAL_BIN/bat" && \
+    c_info 'linked batcat -> bat'
+  [ -x /usr/bin/fdfind ] && run ln -sf /usr/bin/fdfind "$LOCAL_BIN/fd" && \
+    c_info 'linked fdfind -> fd'
 
   # GitHub CLI (own apt repo)
   if ! have gh; then
