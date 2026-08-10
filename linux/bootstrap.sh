@@ -78,12 +78,12 @@ mkdir -p "$LOCAL_BIN"
 
 APT_PACKAGES=(
   # shell
-  zsh tmux stow
+  zsh stow
   # build + fetch
   build-essential curl wget git unzip ca-certificates gnupg pkg-config
   # cli
   ripgrep fd-find bat jq fzf tree htop
-  # clipboard for tmux copy-mode over X11
+  # clipboard bridge for CLI tools over X11 forwarding
   xclip
   # python
   python3 python3-pip python3-venv
@@ -326,8 +326,9 @@ if phase link; then
   [ -d "$AGENT_DIR/.git" ]    || run git clone "$AGENT_REPO" "$AGENT_DIR"
 
   if [ -z "${DRY_RUN:-}" ]; then
-    ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship tmux vim shell )
-    c_good 'stowed: zsh bash git nvim opencode starship tmux vim shell'
+    # tmux is deliberately not stowed here -- not installed on this box.
+    ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell )
+    c_good 'stowed: zsh bash git nvim opencode starship vim shell'
   fi
 
   # Machine-local git identity, mirroring macOS.

@@ -4,8 +4,9 @@ Ubuntu/Debian dev box, driven over SSH from the Windows machine. This is where
 the web work runs; Windows stays for Windows-native projects.
 
 `bootstrap.sh` is the apt/upstream counterpart to `windows/bootstrap.ps1`.
-Unlike Windows, the shared Stow packages (`zsh`, `nvim`, `starship`, `tmux`,
-`git`, `shell`, `opencode`) apply directly — Stow works here.
+Unlike Windows, the shared Stow packages (`zsh`, `nvim`, `starship`, `git`,
+`shell`, `opencode`) apply directly — Stow works here. `tmux` is intentionally
+not installed or stowed on this box.
 
 ## Prerequisites
 
@@ -130,8 +131,21 @@ Never put credentials in the shell — they land in `~/.zsh_history`. Use a
   real names into `~/.local/bin`.
 - **Neovim from GitHub releases**, not apt — apt ships a version too old for
   `blink.cmp` and the rest of the config.
-- **tmux auto-starts on SSH** (`.zshrc`), so a dropped connection doesn't kill
-  your work. Reattach with `tmux a`.
-- **Clipboard**: `.tmux.conf` picks `pbcopy`, `wl-copy`, or `xclip` by
-  availability, falling back to tmux's internal buffer on a bare SSH session.
+- **No tmux.** Not installed, and the `tmux` package isn't stowed. `.zshrc` only
+  auto-starts tmux under Ghostty, so nothing fires here.
+
+  Without it, **anything running in the foreground dies when SSH drops.** For a
+  long-running dev server, use one of:
+
+  ```sh
+  # detach a one-off process
+  nohup npm run dev > dev.log 2>&1 &
+
+  # or run it in Docker, which survives disconnects by design
+  docker compose up -d
+  ```
+
+  If reconnect-and-resume becomes a recurring need, `apt install tmux` and add
+  `tmux` back to the stow list in `bootstrap.sh` — the config is already
+  cross-platform.
 - **obsidian.nvim** is gated to macOS and won't load.

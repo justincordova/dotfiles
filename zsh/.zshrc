@@ -104,8 +104,6 @@ idlem() {
 }
 
 # --- Auto-start ---
-# Ghostty locally; any SSH session too, so remote work survives a dropped link.
-if command -v tmux &>/dev/null && [ -z "$TMUX" ] && \
-   { [ "$TERM_PROGRAM" = "ghostty" ] || [ -n "$SSH_CONNECTION" ]; }; then
+if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
   exec tmux new-session -A -s main
 fi
