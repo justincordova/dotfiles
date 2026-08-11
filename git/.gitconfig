@@ -7,6 +7,7 @@
 # Use your preferred text editor for commit messages (e.g., nano, vim, code)
 [core]
 	editor = code --wait
+	sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
 
 # Enable colored output for Git commands
 [color]
