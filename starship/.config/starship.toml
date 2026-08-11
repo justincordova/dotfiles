@@ -5,13 +5,19 @@ success_symbol = "➜ "
 error_symbol = "✗ "
 # keep it neutral so the folder/git colors stand out
 
-# Both force themselves visible when the shell is elevated (Administrator on
-# Windows, root elsewhere), which is the only time they'd ever appear.
+# username forces itself visible when the shell is elevated (Administrator on
+# Windows, root elsewhere). Never useful -- always hide it.
 [username]
 disabled = true
 
+# hostname is invisible locally and appears only over SSH, so the prompt on the
+# Mac and Windows is unchanged while a remote box announces itself.
 [hostname]
-disabled = true
+disabled = false
+ssh_only = true
+format = "[@$hostname]($style) "
+style = "bold #E59866"   # amber, deliberately unlike the wisteria used locally
+trim_at = "."            # linux-dev2-justin, not the full FQDN
 
 [directory]
 truncation_length = 1

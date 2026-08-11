@@ -28,18 +28,23 @@ DRY_RUN=1 ./bootstrap.sh    # see what it would do
 ./bootstrap.sh
 ```
 
-Phases are independent and re-runnable:
+Phases are re-runnable, and run in this order when you pass none:
 
 ```sh
 ./bootstrap.sh packages    # apt, gh, eza
+./bootstrap.sh link        # clone repos + stow dotfiles
 ./bootstrap.sh tools       # oh-my-zsh, starship, zoxide, lazygit, delta
 ./bootstrap.sh node        # nvm + node, bun, opencode, claude, rtk
 ./bootstrap.sh docker      # docker-ce + compose plugin
 ./bootstrap.sh db          # psql, redis-cli, sqlcmd, supabase
 ./bootstrap.sh nvim        # current Neovim + lazy sync
-./bootstrap.sh link        # clone repos + stow dotfiles
 ./bootstrap.sh agents      # ~/agent install + opencode config
 ```
+
+> `link` **must** precede `tools`. oh-my-zsh's `KEEP_ZSHRC` only stops it
+> replacing an `~/.zshrc` that already exists; with none present it writes its
+> own template, which then blocks `stow zsh` and leaves you on the template
+> instead of your real config.
 
 ## After
 

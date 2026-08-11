@@ -7,7 +7,9 @@
 #   ./bootstrap.sh packages node    # only those phases
 #   DRY_RUN=1 ./bootstrap.sh        # print apt/install actions, change nothing
 #
-# Phases: packages tools node docker db agents link nvim
+# Phases run in this order, and the order matters:
+#   packages link tools node docker db nvim agents
+# `link` precedes `tools` so the stowed ~/.zshrc exists before oh-my-zsh runs.
 #
 set -euo pipefail
 
@@ -142,15 +144,66 @@ if phase packages; then
   fi
 fi
 
+# ----------------------------------------------------------------------- link --
+
+if phase link; then
+  c_head 'Repos + dotfiles'
+
+  [ -d "$DOTFILES_DIR/.git" ] || run git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
+  [ -d "$AGENT_DIR/.git" ]    || run git clone "$AGENT_REPO" "$AGENT_DIR"
+
+  if [ -z "${DRY_RUN:-}" ]; then
+    # tmux is deliberately not stowed here -- not installed on this box.
+    ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell )
+    c_good 'stowed: zsh bash git nvim opencode starship vim shell'
+  fi
+
+  # Machine-local git identity, mirroring macOS.
+  if [ ! -f "$HOME/.gitconfig.local" ]; then
+    if [ -n "${DRY_RUN:-}" ]; then
+      c_info "DRY: write $HOME/.gitconfig.local"
+    else
+      cat > "$HOME/.gitconfig.local" <<'EOF'
+[user]
+	name = Justin Cordova
+	email = CHANGE_ME
+[core]
+	autocrlf = input
+[credential]
+	helper = cache --timeout=3600
+EOF
+      c_warn "created $HOME/.gitconfig.local -- set your email"
+    fi
+  fi
+
+  # command -v is empty until the packages phase has actually installed zsh.
+  zsh_path=$(command -v zsh || echo /usr/bin/zsh)
+  if [ "$SHELL" != "$zsh_path" ]; then
+    c_warn "default shell is $SHELL; switch with: chsh -s $zsh_path"
+  fi
+fi
+
 # ---------------------------------------------------------------------- tools --
 
 if phase tools; then
   c_head 'Tools (upstream installers -- apt versions are too old)'
 
   # oh-my-zsh + the two plugins .zshrc expects. Without these zsh errors on start.
+  #
+  # This phase runs *after* `link` on purpose. KEEP_ZSHRC only stops oh-my-zsh
+  # replacing an .zshrc that already exists -- with none present it writes its
+  # own template regardless, which then blocks `stow zsh` with a conflict and
+  # leaves you on the template instead of your real config.
   if [ ! -d "$HOME/.oh-my-zsh" ]; then
     run sh -c 'RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
     c_good 'oh-my-zsh'
+
+    # Belt and braces: if it clobbered the symlink anyway, put ours back.
+    if [ -z "${DRY_RUN:-}" ] && [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
+      c_warn 'oh-my-zsh replaced ~/.zshrc -- restoring the stowed one'
+      mv "$HOME/.zshrc" "$HOME/.zshrc.oh-my-zsh-template"
+      ( cd "$DOTFILES_DIR" && stow -R zsh )
+    fi
   else
     c_info 'oh-my-zsh (already installed)'
   fi
@@ -326,45 +379,6 @@ if phase nvim; then
   if have nvim && [ -z "${DRY_RUN:-}" ]; then
     nvim --headless '+Lazy! sync' +qa 2>/dev/null || true
     c_good 'plugins synced'
-  fi
-fi
-
-# ----------------------------------------------------------------------- link --
-
-if phase link; then
-  c_head 'Repos + dotfiles'
-
-  [ -d "$DOTFILES_DIR/.git" ] || run git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
-  [ -d "$AGENT_DIR/.git" ]    || run git clone "$AGENT_REPO" "$AGENT_DIR"
-
-  if [ -z "${DRY_RUN:-}" ]; then
-    # tmux is deliberately not stowed here -- not installed on this box.
-    ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell )
-    c_good 'stowed: zsh bash git nvim opencode starship vim shell'
-  fi
-
-  # Machine-local git identity, mirroring macOS.
-  if [ ! -f "$HOME/.gitconfig.local" ]; then
-    if [ -n "${DRY_RUN:-}" ]; then
-      c_info "DRY: write $HOME/.gitconfig.local"
-    else
-      cat > "$HOME/.gitconfig.local" <<'EOF'
-[user]
-	name = Justin Cordova
-	email = CHANGE_ME
-[core]
-	autocrlf = input
-[credential]
-	helper = cache --timeout=3600
-EOF
-      c_warn "created $HOME/.gitconfig.local -- set your email"
-    fi
-  fi
-
-  # command -v is empty until the packages phase has actually installed zsh.
-  zsh_path=$(command -v zsh || echo /usr/bin/zsh)
-  if [ "$SHELL" != "$zsh_path" ]; then
-    c_warn "default shell is $SHELL; switch with: chsh -s $zsh_path"
   fi
 fi
 
