@@ -10,11 +10,11 @@ error_symbol = "✗ "
 [username]
 disabled = true
 
-# hostname is invisible locally and appears only over SSH, so the prompt on the
-# Mac and Windows is unchanged while a remote box announces itself.
+# Always show the machine name -- with three boxes in play, knowing which one a
+# terminal belongs to matters more than the two saved characters.
 [hostname]
 disabled = false
-ssh_only = true
+ssh_only = false
 format = "[@$hostname]($style) "
 style = "bold #E59866"   # amber, deliberately unlike the wisteria used locally
 trim_at = "."            # linux-dev2-justin, not the full FQDN
