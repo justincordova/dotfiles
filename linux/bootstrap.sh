@@ -152,6 +152,22 @@ if phase link; then
   [ -d "$DOTFILES_DIR/.git" ] || run git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
   [ -d "$AGENT_DIR/.git" ]    || run git clone "$AGENT_REPO" "$AGENT_DIR"
 
+  # Stow is all-or-nothing: one pre-existing real file (Ubuntu ships its own
+  # ~/.bashrc and ~/.profile) aborts every package, silently leaving the box
+  # unconfigured. Move any conflicting regular file aside first.
+  STOW_TARGETS=(
+    "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.vimrc"
+    "$HOME/.gitconfig" "$HOME/.gitignore_global" "$HOME/.shell_aliases"
+    "$HOME/.config/starship.toml"
+  )
+  for t in "${STOW_TARGETS[@]}"; do
+    # -e and not -L: a real file/dir, not a symlink we own.
+    if [ -e "$t" ] && [ ! -L "$t" ]; then
+      run mv "$t" "$t.pre-stow"
+      [ -z "${DRY_RUN:-}" ] && c_warn "moved $t -> $t.pre-stow"
+    fi
+  done
+
   if [ -z "${DRY_RUN:-}" ]; then
     # tmux is deliberately not stowed here -- not installed on this box.
     ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell )
