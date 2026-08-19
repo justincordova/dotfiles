@@ -3,6 +3,21 @@
   "plugin": [
     "opencode-glm-quota",
     "@ex-machina/opencode-anthropic-auth@1.8.1",
-    "opencode-claude-auth@latest"
-  ]
+    "opencode-gemini-auth@latest",
+    "opencode-mystatus"
+  ],
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": { "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}" },
+      "enabled": true
+    },
+    "firecrawl": {
+      "type": "local",
+      "command": ["npx", "-y", "firecrawl-mcp"],
+      "environment": { "FIRECRAWL_API_KEY": "{env:FIRECRAWL_API_KEY}" },
+      "enabled": true
+    }
+  }
 }
