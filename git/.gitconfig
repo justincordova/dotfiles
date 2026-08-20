@@ -7,7 +7,23 @@
 # Use your preferred text editor for commit messages (e.g., nano, vim, code)
 [core]
 	editor = code --wait
-	sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
+
+# NOTE: do not set core.sshCommand here.
+#
+# Windows needs it pointed at C:/Windows/System32/OpenSSH/ssh.exe, because the
+# ssh.exe bundled with Git for Windows cannot talk to the Windows OpenSSH agent
+# service. That path is meaningless everywhere else: on Linux and macOS git dies
+# with "cannot exec 'C:/Windows/System32/OpenSSH/ssh.exe'" on every fetch and push.
+#
+# It also cannot be corrected from ~/.gitconfig.local, because the [include] above
+# is read before this section and the later value wins. So put it in
+# ~/.gitconfig.local on the WINDOWS machine only:
+#
+#   git config --file ~/.gitconfig.local \
+#     core.sshCommand C:/Windows/System32/OpenSSH/ssh.exe
+#
+# Same rule as the header: anything platform-dependent belongs in the untracked
+# local file, never in this one.
 
 # Enable colored output for Git commands
 [color]
