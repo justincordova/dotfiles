@@ -1,8 +1,21 @@
-# Machine-specific settings (identity, credential helper, line endings, tool IDs)
-# live here, untracked. Anything platform-dependent belongs in that file, not
-# this one — values set below would override it.
+# Machine-specific settings (credential helper, line endings, tool IDs) live here,
+# untracked. Anything platform-dependent belongs in that file, not this one —
+# values set below would override it.
 [include]
 	path = ~/.gitconfig.local
+
+# Identity is deliberately NOT machine-specific: it is the same person on every
+# machine, so keeping a copy per machine only lets them drift. It did — the Mac
+# said "Justin Cordova" while Windows said "justincordova", which rendered as two
+# different sets of avatar initials across the same repo. Same email throughout,
+# so attribution was never actually broken, but the log read as two people.
+#
+# Declared after the include on purpose: that makes this value win over a stale
+# [user] left behind in any machine's ~/.gitconfig.local, so fixing a machine is
+# just pulling this repo.
+[user]
+	name = justincordova
+	email = justinavodroc@gmail.com
 
 # Use your preferred text editor for commit messages (e.g., nano, vim, code)
 [core]

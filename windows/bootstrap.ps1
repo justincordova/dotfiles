@@ -274,19 +274,20 @@ if (Phase 'link') {
     Link (Join-Path $ocSrc $entry) (Join-Path $ocDst $entry)
   }
 
-  # --- machine-local git identity (untracked, mirrors the macOS setup) ---
+  # --- machine-local git settings (untracked, mirrors the macOS setup) ---
+  # Identity is NOT written here. It lives in the tracked git/.gitconfig, because
+  # it is the same on every machine and a per-machine copy is exactly what let the
+  # name drift between "Justin Cordova" and "justincordova". Only values that
+  # genuinely differ by platform belong in this file.
   $gitLocal = Join-Path $HOME '.gitconfig.local'
   if (-not (Test-Path $gitLocal)) {
     @(
-      '[user]'
-      "`tname = Justin Cordova"
-      "`temail = CHANGE_ME"
       '[core]'
       "`tautocrlf = true"
       '[credential]'
       "`thelper = manager"
     ) | Set-Content $gitLocal -Encoding utf8
-    Warn "created $gitLocal - set your email, and note credential.helper=manager replaces osxkeychain"
+    Warn "created $gitLocal - credential.helper=manager replaces osxkeychain; identity comes from the tracked git/.gitconfig"
   }
 }
 
@@ -386,6 +387,5 @@ Next:
   4. claude   -> /login, then install plugins (see above), then Update-ClaudeHud
   5. opencode -> /connect
   6. Set Windows Terminal font to "JetBrainsMono Nerd Font"
-  7. Edit ~/.gitconfig.local with your email
 
 '@ -ForegroundColor DarkGray
