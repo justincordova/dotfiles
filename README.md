@@ -5,8 +5,8 @@ Personal dotfiles for macOS, Windows, and Linux.
 - **macOS** — [GNU Stow](https://www.gnu.org/software/stow/) symlinks each package into `$HOME`.
 - **Windows** — [`windows/bootstrap.ps1`](windows/README.md) provisions the machine and
   symlinks the shared configs (`nvim/`, `starship/`, `git/`) into their Windows locations.
-- **Linux** — [`linux/bootstrap.sh`](linux/README.md) provisions an Ubuntu/Debian box
-  (apt + upstream installers) and stows the same packages macOS uses.
+- **Linux** — [`linux/bootstrap.sh`](linux/README.md) provisions an Ubuntu, Debian
+  or Fedora box (apt/dnf + upstream installers) and stows the same packages macOS uses.
 
 `nvim/`, `starship/`, and `git/` are shared by both platforms. Anything
 platform-specific (credential helper, line endings, identity) lives in the

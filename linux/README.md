@@ -1,13 +1,20 @@
 # Linux setup
 
-Ubuntu/Debian dev box, driven over SSH from the Windows machine. This is where
-the web work runs; Windows stays for Windows-native projects.
+Linux dev box, driven over SSH from the Windows machine. This is where the web
+work runs; Windows stays for Windows-native projects.
 
-**apt-based distros only** (Ubuntu 22.04+, Debian 12+, and derivatives such as
-Pop!_OS or Mint). The script exits immediately without `apt-get`, so Fedora,
-Arch and the rest are not supported.
+| Distro | Status |
+| --- | --- |
+| Ubuntu 22.04+ | Tested (24.04) |
+| Debian 12+ | Tested (13) |
+| Fedora 41+ | Tested (45) |
+| Mint, Pop!_OS, other Ubuntu/Debian derivatives | Should work, untested — repos are mapped to the base release |
+| Arch, openSUSE, RHEL/Alma/Rocky, … | Not supported; the script exits |
 
-`bootstrap.sh` is the apt/upstream counterpart to `windows/bootstrap.ps1`.
+Only the package steps differ (`apt` vs `dnf`). Everything fetched upstream —
+GitHub releases, nvm, Go, rustup, npm, stow, the OpenCode setup — is identical.
+
+`bootstrap.sh` is the Linux counterpart to `windows/bootstrap.ps1`.
 Unlike Windows, the shared Stow packages (`zsh`, `nvim`, `starship`, `git`,
 `shell`, `opencode`) apply directly — Stow works here. `tmux` is intentionally
 not installed or stowed on this box.
@@ -24,7 +31,9 @@ not installed or stowed on this box.
 ## Run
 
 ```sh
-sudo apt update && sudo apt install -y git
+sudo apt update && sudo apt install -y git    # Ubuntu/Debian
+sudo dnf install -y git                       # Fedora
+
 git clone git@github.com:justincordova/dotfiles.git ~/dotfiles
 cd ~/dotfiles/linux
 
@@ -35,7 +44,7 @@ DRY_RUN=1 ./bootstrap.sh    # see what it would do
 Phases are re-runnable, and run in this order when you pass none:
 
 ```sh
-./bootstrap.sh packages    # apt, gh, eza
+./bootstrap.sh packages    # base packages (apt or dnf), gh, eza
 ./bootstrap.sh ssh         # openssh-server; key-only login once a key is present
 ./bootstrap.sh link        # clone repos + stow dotfiles
 ./bootstrap.sh tools       # oh-my-zsh, starship, lazygit, lazydocker, delta, tree-sitter, go
@@ -51,13 +60,14 @@ Phases are re-runnable, and run in this order when you pass none:
 One phase is **opt-in** and only runs when named:
 
 ```sh
-./bootstrap.sh langs       # Java 21, .NET 8 SDK, Rust -- for nvim's jdtls, OmniSharp, rustfmt
+./bootstrap.sh langs       # Java 21 (25 on Fedora), .NET 10 SDK, Rust -- for nvim's jdtls, OmniSharp, rustfmt
 ```
 
 ## SSH access
 
-Ubuntu Desktop ships without an SSH server; the `ssh` phase installs and
-enables it. It only switches to **key-only login** once
+Ubuntu Desktop ships without an SSH server and Fedora Workstation leaves its
+disabled; the `ssh` phase installs and enables it, and on Fedora also allows
+`ssh` through firewalld. It only switches to **key-only login** once
 `~/.ssh/authorized_keys` exists, so the first run can't lock you out. From
 Windows:
 
@@ -197,7 +207,7 @@ Never put credentials in the shell — they land in `~/.zsh_history`. Use a
 
 ## Differences from macOS
 
-- **No Homebrew.** apt plus upstream installers. `.zshrc` probes for `brew` and
+- **No Homebrew.** apt/dnf plus upstream installers. `.zshrc` probes for `brew` and
   skips it when absent, so the same file works on all three machines.
 - **`bat` and `fd`** are `batcat` and `fdfind` on Debian. The script symlinks the
   real names into `~/.local/bin`.
@@ -224,6 +234,10 @@ Never put credentials in the shell — they land in `~/.zsh_history`. Use a
   `tmux` back to the stow list in `bootstrap.sh` — the config is already
   cross-platform.
 - **obsidian.nvim** is gated to macOS and won't load.
-- **Go from go.dev** into `/usr/local/go`, not apt (too old for current gopls).
+- **Go from go.dev** into `/usr/local/go`, not the distro (too old for current gopls).
+- **Fedora specifics.** `gh` and `eza` come from Fedora's own repos;
+  `redis-cli` is Valkey's compat package (Fedora replaced Redis with Valkey);
+  `sqlcmd` uses Microsoft's RHEL 9 repo, since there is no Fedora one; the
+  Docker daemon is enabled explicitly because Fedora doesn't start it on install.
 - **Directory jumping** is oh-my-zsh's `z` plugin on both machines; zoxide isn't
   installed.
