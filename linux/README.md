@@ -3,6 +3,10 @@
 Ubuntu/Debian dev box, driven over SSH from the Windows machine. This is where
 the web work runs; Windows stays for Windows-native projects.
 
+**apt-based distros only** (Ubuntu 22.04+, Debian 12+, and derivatives such as
+Pop!_OS or Mint). The script exits immediately without `apt-get`, so Fedora,
+Arch and the rest are not supported.
+
 `bootstrap.sh` is the apt/upstream counterpart to `windows/bootstrap.ps1`.
 Unlike Windows, the shared Stow packages (`zsh`, `nvim`, `starship`, `git`,
 `shell`, `opencode`) apply directly — Stow works here. `tmux` is intentionally
@@ -32,8 +36,9 @@ Phases are re-runnable, and run in this order when you pass none:
 
 ```sh
 ./bootstrap.sh packages    # apt, gh, eza
+./bootstrap.sh ssh         # openssh-server; key-only login once a key is present
 ./bootstrap.sh link        # clone repos + stow dotfiles
-./bootstrap.sh tools       # oh-my-zsh, starship, zoxide, lazygit, lazydocker, delta
+./bootstrap.sh tools       # oh-my-zsh, starship, lazygit, lazydocker, delta, tree-sitter, go
 ./bootstrap.sh node        # nvm + node, bun, pnpm, opencode 2, agent-browser, claude, rtk
 ./bootstrap.sh docker      # docker-ce + compose plugin
 ./bootstrap.sh db          # psql, redis-cli, sqlcmd, supabase
@@ -42,6 +47,35 @@ Phases are re-runnable, and run in this order when you pass none:
 ```
 
 `agents` needs npm, so run `node` first if you're running phases one at a time.
+
+One phase is **opt-in** and only runs when named:
+
+```sh
+./bootstrap.sh langs       # Java 21, .NET 8 SDK, Rust -- for nvim's jdtls, OmniSharp, rustfmt
+```
+
+## SSH access
+
+Ubuntu Desktop ships without an SSH server; the `ssh` phase installs and
+enables it. It only switches to **key-only login** once
+`~/.ssh/authorized_keys` exists, so the first run can't lock you out. From
+Windows:
+
+```powershell
+type $HOME\.ssh\id_ed25519.pub | ssh you@linux-box "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+```
+
+Then on the box, `./bootstrap.sh ssh` to turn off password login. The setting
+lives in `/etc/ssh/sshd_config.d/10-dotfiles.conf`; delete it and
+`sudo systemctl reload ssh` to undo.
+
+The SSH tunnels below only work where Windows can reach the box (same LAN). For
+access from elsewhere, put both machines on [Tailscale](https://tailscale.com)
+rather than opening a port on the router.
+
+**Windows Terminal needs a Nerd Font** (e.g. *JetBrainsMono Nerd Font*) for the
+icons in Starship, Neovim and eza. The terminal on your side draws them, not the
+Linux box.
 
 > `link` **must** precede `tools`. oh-my-zsh's `KEEP_ZSHRC` only stops it
 > replacing an `~/.zshrc` that already exists; with none present it writes its
@@ -107,7 +141,8 @@ ssh -L 3000:localhost:3000 you@linux-box
 ```
 
 Then open `http://localhost:3000` in the Windows browser. Nothing is exposed to
-the network, it works on any Wi-Fi, and no firewall changes are needed. Keep that
+the network and no firewall changes are needed (Windows still has to reach the
+box over SSH -- see [SSH access](#ssh-access)). Keep that
 SSH session open — closing it drops the tunnel.
 
 Multiple ports at once:
@@ -189,3 +224,6 @@ Never put credentials in the shell — they land in `~/.zsh_history`. Use a
   `tmux` back to the stow list in `bootstrap.sh` — the config is already
   cross-platform.
 - **obsidian.nvim** is gated to macOS and won't load.
+- **Go from go.dev** into `/usr/local/go`, not apt (too old for current gopls).
+- **Directory jumping** is oh-my-zsh's `z` plugin on both machines; zoxide isn't
+  installed.

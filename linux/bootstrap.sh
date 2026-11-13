@@ -3,13 +3,15 @@
 # Provision an Ubuntu/Debian dev box to match the macOS setup.
 # Idempotent -- safe to re-run. Phases can be run in isolation.
 #
-#   ./bootstrap.sh                  # everything
+#   ./bootstrap.sh                  # every default phase
 #   ./bootstrap.sh packages node    # only those phases
+#   ./bootstrap.sh langs            # opt-in: Java, .NET, Rust
 #   DRY_RUN=1 ./bootstrap.sh        # print apt/install actions, change nothing
 #
 # Phases run in this order, and the order matters:
-#   packages link tools node docker db nvim agents
+#   packages ssh link tools node docker db nvim agents [langs]
 # `link` precedes `tools` so the stowed ~/.zshrc exists before oh-my-zsh runs.
+# Bracketed phases only run when named.
 #
 set -euo pipefail
 
@@ -31,9 +33,14 @@ c_warn() { printf '  \033[0;33m%s\033[0m\n' "$*" >&2; }
 c_info() { printf '  \033[0;90m%s\033[0m\n' "$*" >&2; }
 c_err()  { printf '  \033[0;31m%s\033[0m\n' "$*" >&2; }
 
+OPTIONAL_PHASES=(langs)
+
 phase() {
-  [ ${#PHASES[@]} -eq 0 ] && return 0
   local p
+  if [ ${#PHASES[@]} -eq 0 ]; then
+    for p in "${OPTIONAL_PHASES[@]}"; do [ "$p" = "$1" ] && return 1; done
+    return 0
+  fi
   for p in "${PHASES[@]}"; do [ "$p" = "$1" ] && return 0; done
   return 1
 }
@@ -75,8 +82,8 @@ c_good "${PRETTY_NAME:-unknown}  ($DEB_ARCH)"
 
 # Release assets name architectures inconsistently across projects.
 case "$DEB_ARCH" in
-  amd64) A_LAZYGIT=linux_x86_64; A_LAZYDOCKER=Linux_x86_64; A_DELTA=x86_64-unknown-linux-gnu; A_NVIM=linux-x86_64 ;;
-  arm64) A_LAZYGIT=linux_arm64;  A_LAZYDOCKER=Linux_arm64;  A_DELTA=aarch64-unknown-linux-gnu; A_NVIM=linux-arm64 ;;
+  amd64) A_LAZYGIT=linux_x86_64; A_LAZYDOCKER=Linux_x86_64; A_DELTA=x86_64-unknown-linux-gnu; A_NVIM=linux-x86_64; A_TS=linux-x64 ;;
+  arm64) A_LAZYGIT=linux_arm64;  A_LAZYDOCKER=Linux_arm64;  A_DELTA=aarch64-unknown-linux-gnu; A_NVIM=linux-arm64;  A_TS=linux-arm64 ;;
   *) echo "Unsupported architecture: $DEB_ARCH" >&2; exit 1 ;;
 esac
 
@@ -146,6 +153,47 @@ if phase packages; then
     have eza && c_good 'eza'
   else
     c_info 'eza (already installed)'
+  fi
+fi
+
+# ------------------------------------------------------------------------ ssh --
+
+# This box is driven over SSH from Windows, and Ubuntu Desktop ships no server.
+if phase ssh; then
+  c_head 'SSH server'
+  run sudo apt-get install -y openssh-server
+  # `ssh` is the unit name on Debian/Ubuntu. systemctl fails in containers and
+  # other non-systemd environments; that shouldn't abort the rest of the run.
+  if run sudo systemctl enable --now ssh 2>/dev/null; then
+    c_good 'sshd enabled'
+  else
+    c_warn 'could not enable sshd via systemctl -- start it manually'
+  fi
+
+  # Key-only login, but never before a key is in place, or this would lock
+  # you out. sshd takes the *first* value it reads, and drop-ins load in
+  # lexical order, so 10- beats cloud-init's 50-cloud-init.conf.
+  hardening=/etc/ssh/sshd_config.d/10-dotfiles.conf
+  if [ -s "$HOME/.ssh/authorized_keys" ]; then
+    if [ ! -f "$hardening" ]; then
+      printf '%s\n' 'PasswordAuthentication no' 'KbdInteractiveAuthentication no' \
+        | run sudo tee "$hardening" >/dev/null
+      # `sshd -t` refuses to run without its privsep dir, which socket-activated
+      # sshd (Ubuntu 24.04+) only creates on the first connection.
+      run sudo mkdir -p /run/sshd
+      if [ -n "${DRY_RUN:-}" ] || sudo sshd -t; then
+        run sudo systemctl reload ssh 2>/dev/null || true
+        c_good 'password login disabled (key-only)'
+      else
+        run sudo rm -f "$hardening"
+        c_err 'sshd config test failed -- left password login on'
+      fi
+    else
+      c_info 'key-only login (already configured)'
+    fi
+  else
+    c_warn 'no ~/.ssh/authorized_keys -- password login left ON'
+    c_warn '  add your Windows key, then re-run: ./bootstrap.sh ssh'
   fi
 fi
 
@@ -239,7 +287,35 @@ if phase tools; then
   c_good 'zsh plugins'
 
   have starship || { run sh -c 'curl -fsSL https://starship.rs/install.sh | sh -s -- -y'; c_good 'starship'; }
-  have zoxide   || { run sh -c 'curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh'; c_good 'zoxide'; }
+
+  # nvim-treesitter (main branch) compiles parsers with the tree-sitter CLI;
+  # without it syntax highlighting silently stays off.
+  if ! have tree-sitter; then
+    url=$(gh_asset tree-sitter/tree-sitter "tree-sitter-${A_TS}.gz") || true
+    if [ -n "${url:-}" ]; then
+      run bash -c "curl -fsSL '$url' | gunzip > '$LOCAL_BIN/tree-sitter' && chmod 755 '$LOCAL_BIN/tree-sitter'"
+      c_good 'tree-sitter'
+    else
+      FAILED+=("tree-sitter"); c_err 'tree-sitter: no release asset found'
+    fi
+  else
+    c_info 'tree-sitter (already installed)'
+  fi
+
+  # Go: gopls, delve, golangci-lint and goimports are built by Mason with
+  # `go install`, so they all fail without a toolchain. apt's golang lags.
+  if [ ! -x /usr/local/go/bin/go ]; then
+    gover=$(curl -fsSL 'https://go.dev/VERSION?m=text' | head -1) || true
+    if [ -n "${gover:-}" ]; then
+      run bash -c "curl -fsSL 'https://go.dev/dl/${gover}.linux-${DEB_ARCH}.tar.gz' -o /tmp/go.tar.gz && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf /tmp/go.tar.gz && rm -f /tmp/go.tar.gz"
+      c_good "$gover"
+    else
+      FAILED+=("go"); c_err 'go: could not resolve latest version'
+    fi
+  else
+    c_info "$(/usr/local/go/bin/go version)"
+  fi
+  export PATH="/usr/local/go/bin:$PATH"
 
   # lazygit (`lg`)
   if ! have lazygit; then
@@ -441,7 +517,7 @@ if phase nvim; then
     lock=nvim/.config/nvim/lazy-lock.json
     lock_clean=0
     git -C "$DOTFILES_DIR" diff --quiet -- "$lock" && lock_clean=1
-    nvim --headless '+Lazy! restore' +qa 2>/dev/null || true
+    nvim --headless '+Lazy! restore' +qa >/dev/null 2>&1 || true
     [ "$lock_clean" = 1 ] && git -C "$DOTFILES_DIR" checkout -q -- "$lock"
     c_good 'plugins restored from lazy-lock.json'
   fi
@@ -508,6 +584,40 @@ EOF
   fi
 fi
 
+# ---------------------------------------------------------------------- langs --
+
+# Opt-in (./bootstrap.sh langs). Toolchains for nvim's Java, C# and Rust
+# tooling -- only worth the disk and time if you write those here.
+if phase langs; then
+  c_head 'Language toolchains (Java, .NET, Rust)'
+
+  # jdtls needs Java 21+.
+  if ! have java; then
+    run sudo apt-get install -y openjdk-21-jdk-headless \
+      && c_good 'openjdk 21' || FAILED+=("openjdk-21 (not in this release's apt?)")
+  else
+    c_info "$(java -version 2>&1 | head -1)"
+  fi
+
+  # OmniSharp needs a .NET runtime; the SDK brings one. Ubuntu packages it
+  # natively; Debian gets it from the Microsoft repo the db phase adds.
+  if ! have dotnet; then
+    run sudo apt-get install -y dotnet-sdk-8.0 \
+      && c_good 'dotnet sdk 8' || FAILED+=("dotnet-sdk-8.0 (run the db phase first on Debian)")
+  else
+    c_info "dotnet $(dotnet --version 2>/dev/null)"
+  fi
+
+  # rustfmt and cargo. --no-modify-path: .zshrc already adds ~/.cargo/bin, and
+  # the installer would otherwise write into the stowed rc files.
+  if [ ! -x "$HOME/.cargo/bin/rustup" ]; then
+    run bash -c 'curl -fsSL https://sh.rustup.rs | sh -s -- -y --no-modify-path'
+    c_good 'rustup + stable toolchain'
+  else
+    c_info "$("$HOME/.cargo/bin/rustc" --version 2>/dev/null)"
+  fi
+fi
+
 # -------------------------------------------------------------------- summary --
 
 c_head 'Summary'
@@ -521,12 +631,15 @@ fi
 cat <<'EOF'
 
 Next:
-  1. chsh -s "$(command -v zsh)", then log out and back in
-  2. Fill in API keys in ~/.config/opencode/secrets.env
-  3. rtk init -g        (Claude Code hook; NOT --opencode)
-  4. gh auth login
-  5. claude   -> /login
-  6. opencode -> /connect  (Anthropic, Google), /mcps for supabase + atlassian
+  1. From Windows: type $HOME\.ssh\id_ed25519.pub | ssh user@linux-box "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+     then here: ./bootstrap.sh ssh   (turns off password login)
+  2. chsh -s "$(command -v zsh)", then log out and back in
+  3. Fill in API keys in ~/.config/opencode/secrets.env
+  4. rtk init -g        (Claude Code hook; NOT --opencode)
+  5. gh auth login
+  6. claude   -> /login
+  7. opencode -> /connect  (Anthropic, Google), /mcps for supabase + atlassian
+  8. Optional: ./bootstrap.sh langs   (Java, .NET, Rust for nvim)
 
 From Windows, forward the dev server instead of exposing it:
   ssh -L 3000:localhost:3000 user@linux-box
