@@ -75,8 +75,8 @@ c_good "${PRETTY_NAME:-unknown}  ($DEB_ARCH)"
 
 # Release assets name architectures inconsistently across projects.
 case "$DEB_ARCH" in
-  amd64) A_LAZYGIT=linux_x86_64; A_DELTA=x86_64-unknown-linux-gnu; A_NVIM=linux-x86_64 ;;
-  arm64) A_LAZYGIT=linux_arm64;  A_DELTA=aarch64-unknown-linux-gnu; A_NVIM=linux-arm64 ;;
+  amd64) A_LAZYGIT=linux_x86_64; A_LAZYDOCKER=Linux_x86_64; A_DELTA=x86_64-unknown-linux-gnu; A_NVIM=linux-x86_64 ;;
+  arm64) A_LAZYGIT=linux_arm64;  A_LAZYDOCKER=Linux_arm64;  A_DELTA=aarch64-unknown-linux-gnu; A_NVIM=linux-arm64 ;;
   *) echo "Unsupported architecture: $DEB_ARCH" >&2; exit 1 ;;
 esac
 
@@ -85,6 +85,9 @@ if ! sudo -n true 2>/dev/null; then
 fi
 
 mkdir -p "$LOCAL_BIN"
+# Tools land here (zoxide, lazygit, nvim, claude, rtk). Without it on PATH,
+# `have` misses them, re-runs reinstall them, and the nvim phase skips its sync.
+export PATH="$LOCAL_BIN:$PATH"
 
 # ------------------------------------------------------------------- packages --
 
@@ -94,7 +97,9 @@ APT_PACKAGES=(
   # build + fetch
   build-essential curl wget git unzip ca-certificates gnupg pkg-config
   # cli
-  ripgrep fd-find bat jq fzf tree htop
+  ripgrep fd-find bat jq fzf tree htop shellcheck
+  # `ports` alias (lsof) and the reachability checks in README (nc)
+  lsof netcat-openbsd
   # clipboard bridge for CLI tools over X11 forwarding
   xclip
   # python
@@ -155,10 +160,12 @@ if phase link; then
   # Stow is all-or-nothing: one pre-existing real file (Ubuntu ships its own
   # ~/.bashrc and ~/.profile) aborts every package, silently leaving the box
   # unconfigured. Move any conflicting regular file aside first.
+  # The opencode entries exist if opencode was launched before bootstrap.
   STOW_TARGETS=(
-    "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.vimrc"
+    "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.vimrc"
     "$HOME/.gitconfig" "$HOME/.gitignore_global" "$HOME/.shell_aliases"
-    "$HOME/.config/starship.toml"
+    "$HOME/.config/starship.toml" "$HOME/.config/nvim"
+    "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode/tui.json"
   )
   for t in "${STOW_TARGETS[@]}"; do
     # -e and not -L: a real file/dir, not a symlink we own.
@@ -169,26 +176,27 @@ if phase link; then
   done
 
   if [ -z "${DRY_RUN:-}" ]; then
+    # Pre-create ~/.config/opencode so stow links its entries one by one. Left
+    # absent, stow symlinks the whole directory into the repo and opencode then
+    # writes secrets.env, service.json and node_modules inside the checkout.
+    mkdir -p "$HOME/.config/opencode"
     # tmux is deliberately not stowed here -- not installed on this box.
     ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell )
     c_good 'stowed: zsh bash git nvim opencode starship vim shell'
   fi
 
-  # Machine-local git identity, mirroring macOS.
+  # Machine-local git settings. Identity is tracked in git/.gitconfig.
   if [ ! -f "$HOME/.gitconfig.local" ]; then
     if [ -n "${DRY_RUN:-}" ]; then
       c_info "DRY: write $HOME/.gitconfig.local"
     else
       cat > "$HOME/.gitconfig.local" <<'EOF'
-[user]
-	name = Justin Cordova
-	email = CHANGE_ME
 [core]
 	autocrlf = input
 [credential]
 	helper = cache --timeout=3600
 EOF
-      c_warn "created $HOME/.gitconfig.local -- set your email"
+      c_good "created $HOME/.gitconfig.local"
     fi
   fi
 
@@ -246,6 +254,18 @@ if phase tools; then
     c_info 'lazygit (already installed)'
   fi
 
+  if ! have lazydocker; then
+    url=$(gh_asset jesseduffield/lazydocker "${A_LAZYDOCKER}.tar.gz") || true
+    if [ -n "${url:-}" ]; then
+      run bash -c "curl -fsSL '$url' | tar -xz -C '$LOCAL_BIN' lazydocker"
+      c_good 'lazydocker'
+    else
+      FAILED+=("lazydocker"); c_err 'lazydocker: no release asset found'
+    fi
+  else
+    c_info 'lazydocker (already installed)'
+  fi
+
   # git-delta. The tarball has a versioned top-level dir, so extract to a scratch
   # dir and pull the binary out rather than guessing the path.
   if ! have delta; then
@@ -275,8 +295,11 @@ fi
 if phase node; then
   c_head 'Node + global CLIs'
 
+  # The nvm and bun installers append to ~/.bashrc / ~/.zshrc, which are stowed
+  # symlinks -- that would dirty the tracked files. Both rc files already load
+  # nvm and bun, so stop the installers touching them (PROFILE / SHELL).
   if [ ! -d "$HOME/.nvm" ]; then
-    run bash -c 'curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash'
+    run bash -c 'curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | PROFILE=/dev/null bash'
   fi
   export NVM_DIR="$HOME/.nvm"
   # shellcheck disable=SC1091
@@ -290,13 +313,24 @@ if phase node; then
     c_warn 'nvm not loaded -- open a new shell and re-run: ./bootstrap.sh node'
   fi
 
-  have bun || { run bash -c 'curl -fsSL https://bun.sh/install | bash'; c_good 'bun'; }
+  have bun || [ -x "$HOME/.bun/bin/bun" ] || \
+    { run bash -c 'curl -fsSL https://bun.sh/install | SHELL=/bin/sh bash'; c_good 'bun'; }
 
+  # OpenCode 2 ships as @opencode/cli. The older `opencode-ai` package (and the
+  # opencode.ai/install script) are still OpenCode 1, which cannot load the v2
+  # plugins in opencode/.config/opencode/v2-plugins.
   if have npm; then
-    for pkg in opencode-ai agent-browser; do
+    for pkg in @opencode/cli agent-browser pnpm; do
       c_info "npm install -g $pkg"
       run npm install -g "$pkg" || FAILED+=("npm: $pkg")
     done
+    # agent-browser drives a real Chrome; fetch it plus its shared libraries.
+    # Chrome for Testing has no linux-arm64 build.
+    if [ "$DEB_ARCH" = arm64 ]; then
+      c_warn 'agent-browser: no Chrome for linux-arm64 -- install chromium and pass --executable-path'
+    elif have agent-browser; then
+      run agent-browser install --with-deps || FAILED+=("agent-browser install")
+    fi
   else
     c_warn 'npm unavailable -- skipping global installs'
   fi
@@ -340,14 +374,20 @@ if phase db; then
   c_good 'psql, redis-cli'
 
   # Microsoft SQL Server tools: sqlcmd + bcp
+  # packages-microsoft-prod.deb installs the repo *and* the keyring its
+  # signed-by points at. Hand-writing prod.list without that keyring fails
+  # apt-get update with NO_PUBKEY, which under set -e aborts every later phase.
   if [ ! -x /opt/mssql-tools18/bin/sqlcmd ]; then
-    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
-      | run sudo tee /etc/apt/trusted.gpg.d/microsoft.asc >/dev/null
-    curl -fsSL "https://packages.microsoft.com/config/${ID}/${VERSION_ID}/prod.list" \
-      | run sudo tee /etc/apt/sources.list.d/mssql-release.list >/dev/null
-    run sudo apt-get update -qq
-    run sudo env ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev \
-      || FAILED+=("mssql-tools18")
+    # Files from the old hand-written setup clash with the .deb's Signed-By.
+    run sudo rm -f /etc/apt/sources.list.d/mssql-release.list /etc/apt/trusted.gpg.d/microsoft.asc
+    if run bash -c "curl -fsSL 'https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb' -o /tmp/packages-microsoft-prod.deb \
+        && sudo dpkg -i /tmp/packages-microsoft-prod.deb && rm -f /tmp/packages-microsoft-prod.deb" \
+      && run sudo apt-get update -qq \
+      && run sudo env ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev; then
+      :
+    else
+      FAILED+=("mssql-tools18"); c_err 'mssql-tools18 failed -- other phases continue'
+    fi
   fi
   if [ -x /opt/mssql-tools18/bin/sqlcmd ]; then
     run ln -sf /opt/mssql-tools18/bin/sqlcmd "$LOCAL_BIN/sqlcmd"
@@ -392,9 +432,18 @@ if phase nvim; then
     fi
   fi
 
+  # restore, not sync: sync bumps every plugin and rewrites the tracked
+  # lazy-lock.json; restore installs exactly the versions it pins.
+  # The config's first-run bootstrap clones lazy.nvim at its latest commit and
+  # restore can't roll back the running plugin manager, so the lockfile still
+  # gets that one line rewritten. Put it back -- but only if it was clean.
   if have nvim && [ -z "${DRY_RUN:-}" ]; then
-    nvim --headless '+Lazy! sync' +qa 2>/dev/null || true
-    c_good 'plugins synced'
+    lock=nvim/.config/nvim/lazy-lock.json
+    lock_clean=0
+    git -C "$DOTFILES_DIR" diff --quiet -- "$lock" && lock_clean=1
+    nvim --headless '+Lazy! restore' +qa 2>/dev/null || true
+    [ "$lock_clean" = 1 ] && git -C "$DOTFILES_DIR" checkout -q -- "$lock"
+    c_good 'plugins restored from lazy-lock.json'
   fi
 fi
 
@@ -408,42 +457,55 @@ if phase agents; then
     c_warn "not found: $AGENT_DIR/install.sh"
   fi
 
-  for k in CONTEXT7_API_KEY FIRECRAWL_API_KEY; do
-    if [ -z "${!k:-}" ]; then
-      c_warn "env var $k is not set -- add it to ~/.zshrc.local"
-    fi
-  done
-
-  if [ ! -f "$HOME/.opencode/opencode.json" ]; then
-    if [ -n "${DRY_RUN:-}" ]; then
-      c_info "DRY: write $HOME/.opencode/opencode.json"
-    else
-    mkdir -p "$HOME/.opencode"
-    cat > "$HOME/.opencode/opencode.json" <<'EOF'
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-gemini-auth@latest", "opencode-claude-auth@latest", "opencode-mystatus"],
-  "mcp": {
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": { "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}" },
-      "enabled": true
-    },
-    "firecrawl": {
-      "type": "local",
-      "command": ["npx", "-y", "firecrawl-mcp"],
-      "environment": { "FIRECRAWL_API_KEY": "{env:FIRECRAWL_API_KEY}" },
-      "enabled": true
-    }
-  }
-}
-EOF
-      c_good "wrote $HOME/.opencode/opencode.json"
-    fi
+  # The tracked opencode.json loads ./v2-plugins/{anthropic,quotas}, which
+  # import from their own node_modules. --ignore-scripts: opencode-mystatus's
+  # installer rewrites opencode config, which these local ports replace.
+  export NVM_DIR="$HOME/.nvm"
+  # shellcheck disable=SC1091
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  plugins_dir="$DOTFILES_DIR/opencode/.config/opencode/v2-plugins"
+  if have npm; then
+    run bash -c "cd '$plugins_dir' && npm ci --ignore-scripts --no-audit --no-fund" \
+      && c_good 'opencode v2-plugins deps' || FAILED+=("v2-plugins npm ci")
+  else
+    FAILED+=("v2-plugins npm ci"); c_err 'npm unavailable -- run the node phase first'
   fi
 
-  have rtk && c_warn 'run: rtk init -g'
+  # RTK's shell hook. ~/.opencode applies to every project under $HOME. Do not
+  # use `rtk init --opencode`: it writes an OpenCode 1 plugin.
+  run mkdir -p "$HOME/.opencode/plugins"
+  run ln -sfn "$HOME/.config/opencode/v2-plugins/rtk.ts" "$HOME/.opencode/plugins/rtk.ts"
+  c_good 'rtk opencode plugin'
+
+  # Older bootstraps wrote this file with opencode-claude-auth, which fights the
+  # local anthropic plugin over refresh tokens (see commit d30acf2).
+  if [ -f "$HOME/.opencode/opencode.json" ]; then
+    c_warn "$HOME/.opencode/opencode.json exists -- everything now lives in the"
+    c_warn "  tracked config; delete it unless it holds something deliberate"
+  fi
+
+  # OpenCode rewrites cli.json in place, which would replace a stow symlink,
+  # so it is seeded as a copy rather than linked.
+  if [ ! -f "$HOME/.config/opencode/cli.json" ]; then
+    run cp "$DOTFILES_DIR/linux/opencode-cli.json" "$HOME/.config/opencode/cli.json"
+    c_good 'seeded opencode cli.json'
+  fi
+
+  # Sourced by ~/.zshenv; referenced from opencode.json as {env:NAME}.
+  secrets="$HOME/.config/opencode/secrets.env"
+  if [ ! -f "$secrets" ]; then
+    if [ -n "${DRY_RUN:-}" ]; then
+      c_info "DRY: write $secrets"
+    else
+      cat > "$secrets" <<'EOF'
+# Secrets for OpenCode MCP servers. Untracked; sourced by ~/.zshenv.
+export CONTEXT7_API_KEY=
+export FIRECRAWL_API_KEY=
+EOF
+      chmod 600 "$secrets"
+      c_warn "created $secrets -- fill in the API keys"
+    fi
+  fi
 fi
 
 # -------------------------------------------------------------------- summary --
@@ -459,13 +521,12 @@ fi
 cat <<'EOF'
 
 Next:
-  1. exec zsh          (or log out/in if you ran chsh)
-  2. rtk init -g
-  3. gh auth login
-  4. claude   -> /login
-  5. opencode -> /connect
-  6. Set your email in ~/.gitconfig.local
-  7. Put API keys in ~/.zshrc.local
+  1. chsh -s "$(command -v zsh)", then log out and back in
+  2. Fill in API keys in ~/.config/opencode/secrets.env
+  3. rtk init -g        (Claude Code hook; NOT --opencode)
+  4. gh auth login
+  5. claude   -> /login
+  6. opencode -> /connect  (Anthropic, Google), /mcps for supabase + atlassian
 
 From Windows, forward the dev server instead of exposing it:
   ssh -L 3000:localhost:3000 user@linux-box

@@ -33,13 +33,15 @@ Phases are re-runnable, and run in this order when you pass none:
 ```sh
 ./bootstrap.sh packages    # apt, gh, eza
 ./bootstrap.sh link        # clone repos + stow dotfiles
-./bootstrap.sh tools       # oh-my-zsh, starship, zoxide, lazygit, delta
-./bootstrap.sh node        # nvm + node, bun, opencode, claude, rtk
+./bootstrap.sh tools       # oh-my-zsh, starship, zoxide, lazygit, lazydocker, delta
+./bootstrap.sh node        # nvm + node, bun, pnpm, opencode 2, agent-browser, claude, rtk
 ./bootstrap.sh docker      # docker-ce + compose plugin
 ./bootstrap.sh db          # psql, redis-cli, sqlcmd, supabase
-./bootstrap.sh nvim        # current Neovim + lazy sync
-./bootstrap.sh agents      # ~/agent install + opencode config
+./bootstrap.sh nvim        # current Neovim + plugins pinned by lazy-lock.json
+./bootstrap.sh agents      # ~/agent skills, opencode plugins, secrets template
 ```
+
+`agents` needs npm, so run `node` first if you're running phases one at a time.
 
 > `link` **must** precede `tools`. oh-my-zsh's `KEEP_ZSHRC` only stops it
 > replacing an `~/.zshrc` that already exists; with none present it writes its
@@ -50,18 +52,48 @@ Phases are re-runnable, and run in this order when you pass none:
 
 ```sh
 chsh -s $(command -v zsh)   # then log out and back in
-rtk init -g
+rtk init -g                 # Claude Code hook only -- see below
 gh auth login
 ```
 
-- `claude` -> `/login`
-- `opencode` -> `/connect`
-- Set your email in `~/.gitconfig.local`
-- Put API keys in `~/.zshrc.local` (untracked):
+- Fill in `~/.config/opencode/secrets.env` (untracked, `chmod 600`, sourced by
+  `~/.zshenv` so the OpenCode background service sees it too):
   ```sh
   export CONTEXT7_API_KEY=...
   export FIRECRAWL_API_KEY=...
   ```
+- `claude` -> `/login`
+- `opencode` -> `/connect` for Anthropic and Google, then `/mcps` to sign in to
+  supabase and atlassian (OAuth, no keys)
+
+Git identity is tracked in `git/.gitconfig`; `~/.gitconfig.local` only holds
+line endings and the credential helper.
+
+## OpenCode
+
+This box runs **OpenCode 2**, installed from npm as `@opencode/cli`. Don't
+install `opencode-ai` or use the `opencode.ai/install` script: both are still
+OpenCode 1, which can't load the plugins below.
+
+Everything lives in the tracked `opencode/.config/opencode/`:
+
+| Piece | What it is |
+| --- | --- |
+| `opencode.json` | Plugins, MCP servers (context7, firecrawl, supabase, atlassian), `/mystatus` |
+| `v2-plugins/anthropic` | Claude Pro/Max OAuth (own grant, so it doesn't fight `claude`) |
+| `v2-plugins/quotas` | The `mystatus` quota tool |
+| `v2-plugins/rtk.ts` | RTK shell hook, linked into `~/.opencode/plugins/` |
+
+`v2-plugins/` imports from its own `node_modules`, which the `agents` phase
+installs with `npm ci --ignore-scripts`. After pulling plugin changes, re-run
+`./bootstrap.sh agents`.
+
+> Don't run `rtk init --opencode`. It writes an OpenCode 1 plugin that would
+> shadow the v2 `rtk.ts` above.
+
+`cli.json` (theme, sidebar) is copied from `linux/opencode-cli.json` rather than
+stowed, because OpenCode rewrites that file in place and would replace the
+symlink.
 
 **Log out and back in after the docker phase** — group membership only applies to
 new login sessions. Until then `docker` needs `sudo`.
@@ -134,6 +166,9 @@ Never put credentials in the shell — they land in `~/.zsh_history`. Use a
   skips it when absent, so the same file works on all three machines.
 - **`bat` and `fd`** are `batcat` and `fdfind` on Debian. The script symlinks the
   real names into `~/.local/bin`.
+- **OpenCode from npm** (`@opencode/cli`), not Homebrew.
+- **Git editor.** `.gitconfig` uses `code --wait`; when `code` isn't on PATH
+  (plain SSH), `.zshrc` sets `GIT_EDITOR=nvim` instead.
 - **Neovim from GitHub releases**, not apt — apt ships a version too old for
   `blink.cmp` and the rest of the config.
 - **No tmux.** Not installed, and the `tmux` package isn't stowed. `.zshrc` only
