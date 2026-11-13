@@ -8,3 +8,7 @@
 .config/opencode/projects/
 .config/opencode/history.jsonl
 .config/opencode/node_modules/
+# v2-plugins: deps come from `npm ci`; backup/ holds pre-migration configs that
+# may contain credentials.
+opencode/.config/opencode/v2-plugins/node_modules/
+opencode/.config/opencode/v2-plugins/backup/

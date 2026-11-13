@@ -22,11 +22,11 @@ Stowing a package symlinks its contents into the right place.
 | `bash/`     | `~/.bashrc`                  | Bash shell config (Starship prompt)    |
 | `git/`      | `~/.gitconfig`, global ignore | Identity lives in `~/.gitconfig.local` |
 | `nvim/`     | `~/.config/nvim/`            | lazy.nvim-based Neovim config          |
-| `opencode/` | `~/.config/opencode/`        | Theme, agents, commands, skills        |
+| `opencode/` | `~/.config/opencode/`        | Config, theme, v2 plugins              |
 | `starship/` | `~/.config/starship.toml`    | Cross-shell prompt                     |
 | `tmux/`     | `~/.tmux.conf`, theme        | TPM + theme switcher                   |
 | `vim/`      | `~/.vimrc`                   | Minimal Vim fallback                   |
-| `zsh/`      | `~/.zshrc`                   | Primary shell (Starship prompt)        |
+| `zsh/`      | `~/.zshrc`, `~/.zshenv`      | Primary shell (Starship prompt)        |
 | `shell/`    | `~/.shell_aliases`           | Aliases shared by bash + zsh           |
 
 `scripts/`, `windows/`, and `linux/` are **not** Stow packages. `scripts/` is
@@ -45,8 +45,16 @@ stow zsh bash git nvim opencode starship tmux vim shell
 
 To remove a package's symlinks: `stow -D <package>`.
 
-API keys are **not** tracked. `~/.opencode/opencode.json` holds the MCP server
-secrets and stays untracked on every machine.
+API keys are **not** tracked. They live in `~/.config/opencode/secrets.env`
+(untracked, sourced by `~/.zshenv`) and the tracked `opencode.json` references
+them as `{env:NAME}`.
+
+The OpenCode plugins in `opencode/.config/opencode/v2-plugins/` need their
+dependencies installed once per machine:
+
+```sh
+cd ~/.config/opencode/v2-plugins && npm ci --ignore-scripts
+```
 
 ## Setup (Linux)
 

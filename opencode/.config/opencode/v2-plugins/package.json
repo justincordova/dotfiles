@@ -1,0 +1,11 @@
+{
+  "name": "local-opencode-v2-plugins",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ex-machina/opencode-anthropic-auth": "1.8.6",
+    "@opencode/plugin": "2.2.0",
+    "opencode-claude-auth": "3.0.0",
+    "opencode-mystatus": "1.2.4"
+  }
+}
