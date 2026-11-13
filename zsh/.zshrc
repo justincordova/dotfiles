@@ -40,6 +40,10 @@ eval "$(starship init zsh)"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
+# .gitconfig sets core.editor to `code --wait`; over plain SSH there is no
+# `code`, so commits would fail to open an editor. GIT_EDITOR overrides it.
+command -v code >/dev/null 2>&1 || export GIT_EDITOR=nvim
+
 # Conda (macOS install path; skipped where absent)
 if [ -x /opt/anaconda3/bin/conda ]; then
   __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
