@@ -84,10 +84,16 @@ alias lg="lazygit"
 alias gmp="git checkout main && git pull"
 
 # Dev / Misc
+alias ports='lsof -nP -iTCP -sTCP:LISTEN'
 alias py3='python3'
 alias py='python'
 alias fishy="asciiquarium"
 alias ghd='gh dash'
+# ngrok misparses TERM=tmux-256color as Solaris and disables its color UI
+# (https://github.com/ngrok/ngrok/issues/100). Override TERM just for ngrok
+# rather than changing tmux's default-terminal, which would break truecolor
+# elsewhere (e.g. Neovim).
+ngrok() { TERM=xterm-256color command ngrok "$@"; }
 
 # --- Functions ---
 mkcd() { mkdir -p "$1" && cd "$1"; }
