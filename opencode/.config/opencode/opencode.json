@@ -1,10 +1,9 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "opencode-glm-quota",
-    "@ex-machina/opencode-anthropic-auth@1.8.1",
-    "opencode-gemini-auth@latest",
-    "opencode-mystatus"
+    "./v2-plugins/quotas",
+    "./v2-plugins/anthropic",
+    "opencode-gemini-auth@latest"
   ],
   "mcp": {
     "context7": {
@@ -17,6 +16,16 @@
       "type": "local",
       "command": ["npx", "-y", "firecrawl-mcp"],
       "environment": { "FIRECRAWL_API_KEY": "{env:FIRECRAWL_API_KEY}" },
+      "enabled": true
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?project_ref=yccibhnregkufdsxauxi&features=database,docs",
+      "enabled": true
+    },
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v2/mcp",
       "enabled": true
     }
   }
