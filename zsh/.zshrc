@@ -18,6 +18,8 @@ path=(
   "$HOME/.local/bin"
   "$HOME/.fly/bin"
   "$GOPATH/bin"
+  "$HOME/.cargo/bin"
+  /usr/local/go/bin
   $path
 )
 export PATH
