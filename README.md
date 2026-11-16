@@ -25,6 +25,7 @@ Stowing a package symlinks its contents into the right place.
 | `opencode/` | `~/.config/opencode/`        | Config, theme, v2 plugins              |
 | `starship/` | `~/.config/starship.toml`    | Cross-shell prompt                     |
 | `tmux/`     | `~/.tmux.conf`, theme        | TPM + theme switcher                   |
+| `gh-dash/`  | `~/.config/gh-dash/`         | `gh dash` (`ghd`) sections + diffnav   |
 | `vim/`      | `~/.vimrc`                   | Minimal Vim fallback                   |
 | `zsh/`      | `~/.zshrc`, `~/.zshenv`      | Primary shell (Starship prompt)        |
 | `shell/`    | `~/.shell_aliases`           | Aliases shared by bash + zsh           |
@@ -40,7 +41,7 @@ explicitly.
 ```sh
 git clone git@github.com:justincordova/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-stow zsh bash git nvim opencode starship tmux vim shell
+stow zsh bash git nvim opencode starship tmux vim shell gh-dash
 ```
 
 To remove a package's symlinks: `stow -D <package>`.
