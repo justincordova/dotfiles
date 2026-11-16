@@ -6,14 +6,20 @@ THEME_FILE="$HOME/.tmux.theme.conf"
 # Canonical Jellybeans theme lives in the dotfiles repo (single source of truth).
 JELLYBEANS_SRC="$HOME/dotfiles/tmux/.tmux.theme.conf"
 
+# ~/.tmux.theme.conf is normally a stow symlink to $JELLYBEANS_SRC. Writing
+# through it would overwrite the tracked file, so other themes replace the
+# link with a local file and Jellybeans restores the link.
+
 # Jellybeans: static theme (no catppuccin plugin)
 if [ "$THEME" = "jellybeans" ]; then
-    cp "$JELLYBEANS_SRC" "$THEME_FILE"
+    ln -sfn "$JELLYBEANS_SRC" "$THEME_FILE"
 
     tmux source-file ~/.tmux.conf > /dev/null 2>&1
     tmux display-message "Theme switched to Jellybeans"
     exit 0
 fi
+
+rm -f "$THEME_FILE"
 
 # Start writing the theme configuration
 echo "# $THEME Theme (via catppuccin/tmux)" > "$THEME_FILE"
