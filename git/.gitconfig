@@ -20,6 +20,13 @@
 # Use your preferred text editor for commit messages (e.g., nano, vim, code)
 [core]
 	editor = code --wait
+	# delta is on every machine: brew (macOS), winget (windows/bootstrap.ps1),
+	# linux/bootstrap.sh.
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true    # n / N jump between files in a diff
 
 # NOTE: do not set core.sshCommand here.
 #
