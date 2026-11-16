@@ -110,8 +110,8 @@ c_good "${PRETTY_NAME:-unknown}  ($ARCH, $PM)"
 
 # Release assets name architectures inconsistently across projects.
 case "$ARCH" in
-  amd64) A_LAZYGIT=linux_x86_64; A_LAZYDOCKER=Linux_x86_64; A_DELTA=x86_64-unknown-linux-gnu; A_NVIM=linux-x86_64; A_TS=linux-x64 ;;
-  arm64) A_LAZYGIT=linux_arm64;  A_LAZYDOCKER=Linux_arm64;  A_DELTA=aarch64-unknown-linux-gnu; A_NVIM=linux-arm64;  A_TS=linux-arm64 ;;
+  amd64) A_LAZYGIT=linux_x86_64; A_LAZYDOCKER=Linux_x86_64; A_DIFFNAV=Linux_x86_64; A_DELTA=x86_64-unknown-linux-gnu; A_NVIM=linux-x86_64; A_TS=linux-x64 ;;
+  arm64) A_LAZYGIT=linux_arm64;  A_LAZYDOCKER=Linux_arm64;  A_DIFFNAV=Linux_arm64;  A_DELTA=aarch64-unknown-linux-gnu; A_NVIM=linux-arm64;  A_TS=linux-arm64 ;;
 esac
 
 pkg_refresh() {
@@ -144,9 +144,9 @@ export PATH="$LOCAL_BIN:$PATH"
 
 # Same tools, per-family names; lines correspond across the two lists.
 APT_PACKAGES=(
-  zsh stow                                          # shell
+  zsh stow tmux                                     # shell
   build-essential pkg-config                        # build
-  curl wget git unzip ca-certificates gnupg         # fetch
+  curl wget git git-lfs unzip ca-certificates gnupg # fetch
   ripgrep fd-find bat jq fzf tree htop shellcheck   # cli
   lsof netcat-openbsd                               # `ports` alias, README's nc checks
   xclip                                             # clipboard over X11 forwarding
@@ -154,9 +154,9 @@ APT_PACKAGES=(
   libsqlite3-dev sqlite3                            # clib for nvim's sqlite.lua
 )
 DNF_PACKAGES=(
-  zsh stow
+  zsh stow tmux
   gcc gcc-c++ make pkgconf-pkg-config
-  curl wget2-wget git unzip tar gzip ca-certificates gnupg2
+  curl wget2-wget git git-lfs unzip tar gzip ca-certificates gnupg2
   ripgrep fd-find bat jq fzf tree htop ShellCheck
   lsof nmap-ncat
   xclip
@@ -283,6 +283,7 @@ if phase link; then
     "$HOME/.gitconfig" "$HOME/.gitignore_global" "$HOME/.shell_aliases"
     "$HOME/.config/starship.toml" "$HOME/.config/nvim"
     "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode/tui.json"
+    "$HOME/.tmux.conf" "$HOME/.tmux.theme.conf" "$HOME/.config/gh-dash/config.yml"
   )
   for t in "${STOW_TARGETS[@]}"; do
     # -e and not -L: a real file/dir, not a symlink we own.
@@ -297,9 +298,8 @@ if phase link; then
     # absent, stow symlinks the whole directory into the repo and opencode then
     # writes secrets.env, service.json and node_modules inside the checkout.
     mkdir -p "$HOME/.config/opencode"
-    # tmux is deliberately not stowed here -- not installed on this box.
-    ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell )
-    c_good 'stowed: zsh bash git nvim opencode starship vim shell'
+    ( cd "$DOTFILES_DIR" && stow -R zsh bash git nvim opencode starship vim shell tmux gh-dash )
+    c_good 'stowed: zsh bash git nvim opencode starship vim shell tmux gh-dash'
   fi
 
   # Machine-local git settings. Identity is tracked in git/.gitconfig.
@@ -432,6 +432,40 @@ if phase tools; then
     fi
   else
     c_info 'delta (already installed)'
+  fi
+
+  # gh-dash (`ghd`) and the diff pager its config uses (pager.diff: diffnav).
+  # `gh extension install` works before `gh auth login`, but `gh extension
+  # list` doesn't -- so check for the installed directory instead.
+  if have gh && [ ! -d "${XDG_DATA_HOME:-$HOME/.local/share}/gh/extensions/gh-dash" ]; then
+    run gh extension install dlvhdr/gh-dash && c_good 'gh-dash' || FAILED+=("gh-dash")
+  else
+    c_info 'gh-dash (already installed)'
+  fi
+  if ! have diffnav; then
+    url=$(gh_asset dlvhdr/diffnav "${A_DIFFNAV}.tar.gz") || true
+    if [ -n "${url:-}" ]; then
+      run bash -c "curl -fsSL '$url' | tar -xz -C '$LOCAL_BIN' diffnav"
+      c_good 'diffnav'
+    else
+      FAILED+=("diffnav"); c_err 'diffnav: no release asset found'
+    fi
+  else
+    c_info 'diffnav (already installed)'
+  fi
+
+  # tmux plugin manager plus the plugins .tmux.conf declares. install_plugins
+  # asks a running server for the config, so start a throwaway detached one.
+  tpm="$HOME/.tmux/plugins/tpm"
+  [ -d "$tpm" ] || run git clone -q https://github.com/tmux-plugins/tpm "$tpm"
+  if have tmux && [ -z "${DRY_RUN:-}" ]; then
+    tmux new-session -d -s bootstrap-tpm 2>/dev/null || true
+    if "$tpm/bin/install_plugins" >/dev/null 2>&1; then
+      c_good 'tmux plugins'
+    else
+      FAILED+=("tmux plugins")
+    fi
+    tmux kill-session -t bootstrap-tpm 2>/dev/null || true
   fi
 fi
 

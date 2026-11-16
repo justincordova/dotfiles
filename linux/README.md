@@ -16,8 +16,7 @@ GitHub releases, nvm, Go, rustup, npm, stow, the OpenCode setup — is identical
 
 `bootstrap.sh` is the Linux counterpart to `windows/bootstrap.ps1`.
 Unlike Windows, the shared Stow packages (`zsh`, `nvim`, `starship`, `git`,
-`shell`, `opencode`) apply directly — Stow works here. `tmux` is intentionally
-not installed or stowed on this box.
+`shell`, `opencode`, `tmux`, `gh-dash`) apply directly — Stow works here.
 
 ## Prerequisites
 
@@ -47,7 +46,8 @@ Phases are re-runnable, and run in this order when you pass none:
 ./bootstrap.sh packages    # base packages (apt or dnf), gh, eza
 ./bootstrap.sh ssh         # openssh-server; key-only login once a key is present
 ./bootstrap.sh link        # clone repos + stow dotfiles
-./bootstrap.sh tools       # oh-my-zsh, starship, lazygit, lazydocker, delta, tree-sitter, go
+./bootstrap.sh tools       # oh-my-zsh, starship, lazygit, lazydocker, delta, tree-sitter, go,
+                           # gh-dash + diffnav, tmux plugins (TPM)
 ./bootstrap.sh node        # nvm + node, bun, pnpm, opencode 2, agent-browser, claude, rtk
 ./bootstrap.sh docker      # docker-ce + compose plugin
 ./bootstrap.sh db          # psql, redis-cli, sqlcmd, supabase
@@ -142,6 +142,20 @@ symlink.
 **Log out and back in after the docker phase** — group membership only applies to
 new login sessions. Until then `docker` needs `sudo`.
 
+## tmux
+
+Every SSH login lands in one shared tmux session, `main`, so a dropped
+connection loses nothing: the dev server, OpenCode, and your panes keep
+running, and the next `ssh` reattaches. Same config as the Mac (`Ctrl-a`
+prefix, `Prefix + T` theme menu, resurrect/continuum).
+
+- **Detach** with `Ctrl-a d`. That also ends the SSH session, since the login
+  shell was replaced by tmux.
+- **Skip tmux** for one login: `ssh -t you@linux-box NO_TMUX=1 zsh -l`.
+- VS Code's integrated terminal over Remote-SSH is left alone.
+- **Clipboard:** `y` in copy mode sends the selection to Windows via OSC 52
+  (`set-clipboard on`), which Windows Terminal supports.
+
 ## Reaching the dev server from Windows
 
 Forward the port over SSH rather than exposing it:
@@ -153,7 +167,8 @@ ssh -L 3000:localhost:3000 you@linux-box
 Then open `http://localhost:3000` in the Windows browser. Nothing is exposed to
 the network and no firewall changes are needed (Windows still has to reach the
 box over SSH -- see [SSH access](#ssh-access)). Keep that
-SSH session open — closing it drops the tunnel.
+SSH session open — closing it drops the tunnel (the dev server itself keeps
+running inside tmux).
 
 Multiple ports at once:
 
@@ -216,23 +231,7 @@ Never put credentials in the shell — they land in `~/.zsh_history`. Use a
   (plain SSH), `.zshrc` sets `GIT_EDITOR=nvim` instead.
 - **Neovim from GitHub releases**, not apt — apt ships a version too old for
   `blink.cmp` and the rest of the config.
-- **No tmux.** Not installed, and the `tmux` package isn't stowed. `.zshrc` only
-  auto-starts tmux under Ghostty, so nothing fires here.
-
-  Without it, **anything running in the foreground dies when SSH drops.** For a
-  long-running dev server, use one of:
-
-  ```sh
-  # detach a one-off process
-  nohup npm run dev > dev.log 2>&1 &
-
-  # or run it in Docker, which survives disconnects by design
-  docker compose up -d
-  ```
-
-  If reconnect-and-resume becomes a recurring need, `apt install tmux` and add
-  `tmux` back to the stow list in `bootstrap.sh` — the config is already
-  cross-platform.
+- **tmux starts on SSH login** instead of under Ghostty. See [tmux](#tmux).
 - **obsidian.nvim** is gated to macOS and won't load.
 - **Go from go.dev** into `/usr/local/go`, not the distro (too old for current gopls).
 - **Fedora specifics.** `gh` and `eza` come from Fedora's own repos;
