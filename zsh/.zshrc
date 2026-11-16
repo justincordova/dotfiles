@@ -1,5 +1,5 @@
 export ZSH="$HOME/.oh-my-zsh"
-export BAT_THEME="Twork"
+export BAT_THEME="TwoDark"   # also delta's syntax theme
 export BUN_INSTALL="$HOME/.bun"
 export NVM_DIR="$HOME/.nvm"
 export GOPATH="$HOME/go"
@@ -116,6 +116,11 @@ idlem() {
 }
 
 # --- Auto-start ---
-if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "ghostty" ]; then
+# Ghostty locally, or any SSH login (so work survives a dropped connection).
+# Skipped inside VS Code's terminal, and with NO_TMUX=1 as an escape hatch:
+#   ssh -t host NO_TMUX=1 zsh -l
+if command -v tmux &>/dev/null && [ -z "$TMUX" ] && [ -z "$NO_TMUX" ] \
+  && [ "$TERM_PROGRAM" != "vscode" ] \
+  && { [ "$TERM_PROGRAM" = "ghostty" ] || [ -n "$SSH_CONNECTION" ]; }; then
   exec tmux new-session -A -s main
 fi
