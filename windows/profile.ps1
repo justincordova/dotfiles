@@ -2,18 +2,34 @@
 # Symlinked to $PROFILE.CurrentUserAllHosts by windows/bootstrap.ps1.
 
 # --- Environment ---
-$env:BAT_THEME = 'Twork'
+$env:BAT_THEME = 'TwoDark'   # also delta's syntax theme
 $env:BUN_INSTALL = "$HOME\.bun"
 $env:GOPATH = "$HOME\go"
 $env:EDITOR = 'nvim'
 
+# --- Secrets (untracked; same file ~/.zshenv sources on macOS/Linux) ---
+# KEY=value or `export KEY=value` lines; referenced from opencode.json as
+# {env:KEY}. Empty values are skipped so user-level env vars still win.
+$SecretsFile = "$HOME\.config\opencode\secrets.env"
+if (Test-Path $SecretsFile) {
+  foreach ($line in Get-Content $SecretsFile) {
+    if ($line -match '^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$') {
+      $value = $Matches[2].Trim().Trim('"').Trim("'")
+      if ($value) { Set-Item "Env:$($Matches[1])" $value }
+    }
+  }
+}
+
 # --- PATH (prepend, de-duplicated) ---
+# psql: EDB's installer doesn't add its bin dir to PATH. Newest version wins.
+$PgBin = Get-ChildItem 'C:\Program Files\PostgreSQL\*\bin' -Directory -ErrorAction SilentlyContinue |
+  Sort-Object { $_.Parent.Name -as [int] } -Descending | Select-Object -First 1
 $PrependPaths = @(
   "$env:BUN_INSTALL\bin"
   "$HOME\.local\bin"
   "$env:GOPATH\bin"
   "$HOME\AppData\Roaming\npm"
-)
+) + @($PgBin | ForEach-Object FullName)
 $Existing = $env:PATH -split ';' | Where-Object { $_ }
 $env:PATH = (($PrependPaths + $Existing) | Select-Object -Unique) -join ';'
 
@@ -101,6 +117,13 @@ function gmp { git checkout main; git pull }
 function py  { python @args }
 function py3 { python @args }
 function ghd { gh dash @args }
+
+# Listening TCP ports and their processes (zsh: lsof -nP -iTCP -sTCP:LISTEN)
+function ports {
+  Get-NetTCPConnection -State Listen | Sort-Object LocalPort | Select-Object LocalAddress, LocalPort,
+    @{ n = 'PID'; e = { $_.OwningProcess } },
+    @{ n = 'Process'; e = { (Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).ProcessName } }
+}
 
 # --- Functions ---
 function mkcd {
