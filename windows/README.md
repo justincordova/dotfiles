@@ -9,7 +9,7 @@ Native Windows + PowerShell 7. No WSL, no Stow.
 
 | macOS                          | Windows                                         |
 | ------------------------------ | ----------------------------------------------- |
-| `~/.zshrc`, `~/.zshenv`        | `profile.ps1` -> `$PROFILE.CurrentUserAllHosts` |
+| `~/.zshrc`, `~/.zshenv`        | `profile.ps1`, loaded from `$PROFILE.CurrentUserAllHosts` (a one-line loader, not a symlink: Documents is often in OneDrive) |
 | Homebrew                       | winget (+ npm, + GitHub releases for rtk, diffnav, supabase) |
 | GNU Stow                       | `bootstrap.ps1 -Only link`                      |
 | `~/.config/nvim`               | `%LOCALAPPDATA%\nvim`                           |
@@ -51,7 +51,8 @@ cd $HOME\dotfiles\windows
 ```
 
 Everything already installed is skipped, so re-running is safe — including on
-a machine that's already set up.
+a machine that's already set up. A package counts as installed if winget knows
+it **or** its command is already on PATH (Store, scoop or manual installs).
 
 Restart the terminal after `packages` — winget changes `PATH` and the current
 session only partly picks it up.

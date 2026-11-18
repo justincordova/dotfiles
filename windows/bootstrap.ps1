@@ -111,6 +111,11 @@ function Install-Winget {
 
   if ($script:Skip -and $script:Skip -contains $Id) { Warn "$Id (skipped by -Skip)"; return }
 
+  # Installed some other way (Microsoft Store, scoop, an installer) - winget
+  # doesn't match those by ID, and a second copy would shadow the first.
+  $cmd = $script:WingetCommands[$Id]
+  if ($cmd -and (Have $cmd)) { Info "$Id (already installed: $cmd)"; return }
+
   # Per-ID lookup: the table from a bare `winget list` truncates long IDs.
   winget list --id $Id --exact --disable-interactivity --accept-source-agreements *> $null
   if ($LASTEXITCODE -eq 0) { Info "$Id (already installed)"; return }
@@ -256,6 +261,42 @@ $WingetPackages = @(
   'tree-sitter.tree-sitter-cli'
 )
 
+# The command each package provides, where checking for it is reliable. Not
+# Python: Windows ships a `python` stub that opens the Store.
+$WingetCommands = @{
+  'Microsoft.PowerShell'        = 'pwsh'
+  'Starship.Starship'           = 'starship'
+  'Git.Git'                     = 'git'
+  'GitHub.cli'                  = 'gh'
+  'JesseDuffield.lazygit'       = 'lazygit'
+  'dandavison.delta'            = 'delta'
+  'Neovim.Neovim'               = 'nvim'
+  'Microsoft.VisualStudioCode'  = 'code'
+  'BurntSushi.ripgrep.MSVC'     = 'rg'
+  'sharkdp.fd'                  = 'fd'
+  'sharkdp.bat'                 = 'bat'
+  'eza-community.eza'           = 'eza'
+  'junegunn.fzf'                = 'fzf'
+  'ajeetdsouza.zoxide'          = 'zoxide'
+  'jqlang.jq'                   = 'jq'
+  'koalaman.shellcheck'         = 'shellcheck'
+  'Casey.Just'                  = 'just'
+  'XAMPPRocky.Tokei'            = 'tokei'
+  'Fastfetch-cli.Fastfetch'     = 'fastfetch'
+  'Tailscale.Tailscale'         = 'tailscale'
+  'CoreyButler.NVMforWindows'   = 'nvm'
+  'Oven-sh.Bun'                 = 'bun'
+  'GoLang.Go'                   = 'go'
+  'LLVM.LLVM'                   = 'clang'
+  'Kitware.CMake'               = 'cmake'
+  'ezwinports.make'             = 'make'
+  'tree-sitter.tree-sitter-cli' = 'tree-sitter'
+  'Microsoft.Sqlcmd'            = 'sqlcmd'
+  'Docker.DockerDesktop'        = 'docker'
+  'JesseDuffield.Lazydocker'    = 'lazydocker'
+  'Rustlang.Rustup'             = 'rustup'
+}
+
 if (Phase 'packages') {
   Head "Packages ($($WingetPackages.Count) via winget)"
   foreach ($id in $WingetPackages) { Install-Winget $id }
@@ -332,7 +373,7 @@ if (Phase 'opencode') {
   Head 'OpenCode 2'
   $major = Get-OpenCodeMajor
   if ($major -ge 2) {
-    Info "opencode $(opencode --version) (already installed)"
+    Info "$(opencode --version) (already installed)"
   } elseif (-not (Have npm)) {
     Warn 'npm unavailable - run the node phase first'
     $Failed.Add('opencode')
@@ -370,7 +411,29 @@ if (Phase 'link') {
   Link (Join-Path $DotfilesDir 'gh-dash\.config\gh-dash') (Join-Path $HOME '.config\gh-dash')
 
   # PowerShell profile - AllHosts so it applies to Terminal, VS Code, and ISE.
-  Link (Join-Path $DotfilesDir 'windows\profile.ps1') $PROFILE.CurrentUserAllHosts
+  # Documents is often redirected into OneDrive, which mishandles symlinks, so
+  # the profile is a one-line loader rather than a link.
+  $profilePath = $PROFILE.CurrentUserAllHosts
+  $loader = ". `"$(Join-Path $DotfilesDir 'windows\profile.ps1')`""
+  $current = if (Test-Path -LiteralPath $profilePath) { Get-Item -LiteralPath $profilePath -Force } else { $null }
+  if ($current -and $current.LinkType -ne 'SymbolicLink' -and
+      (Get-Content -LiteralPath $profilePath -Raw) -match [regex]::Escape($loader)) {
+    Info "$profilePath (already loads dotfiles)"
+  } elseif ($PSCmdlet.ShouldProcess($profilePath, 'write loader for windows\profile.ps1')) {
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $profilePath) | Out-Null
+    if ($current) {
+      if ($current.LinkType -eq 'SymbolicLink') {
+        Remove-Item -LiteralPath $profilePath -Force
+      } else {
+        $backup = "$profilePath.bak-$(Get-Date -Format yyyyMMddHHmmss)"
+        Move-Item -LiteralPath $profilePath -Destination $backup
+        Warn "backed up existing $profilePath -> $backup"
+      }
+    }
+    @('# Loads the tracked profile. Machine-only additions: ~/.pwsh_profile.local.ps1', $loader) |
+      Set-Content -LiteralPath $profilePath -Encoding utf8
+    Info "$profilePath -> loads windows\profile.ps1"
+  }
 
   # OpenCode 2 uses ~/.config/opencode on Windows as well. Link entries one by
   # one, like stow does on macOS, so secrets.env, cli.json, service.json and
@@ -549,7 +612,7 @@ if (Phase 'agents') {
   } elseif ($major -lt 2) {
     $Notes.Add("OpenCode $(opencode --version) is v1 and can't load the v2 plugins: .\bootstrap.ps1 -Only opencode")
   } else {
-    Good "opencode $(opencode --version)"
+    Good "$(opencode --version) (v2 plugins supported)"
   }
 }
 
