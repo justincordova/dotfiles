@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "instructions": ["~/.config/opencode/rules/*.md", "~/.config/opencode/RTK.md"],
   "plugin": [
     "./v2-plugins/quotas",
     "./v2-plugins/anthropic",
